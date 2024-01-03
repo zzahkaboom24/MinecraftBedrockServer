@@ -544,3 +544,4 @@ elif [ "$ViewManager" == "tmux" ]; then
     echo "Minecraft server failed to start after 20 seconds."
   else
     echo "Minecraft server has started. Type tmux attach -t MinecraftBedrockServer:0 to view the running server!"
+fi
