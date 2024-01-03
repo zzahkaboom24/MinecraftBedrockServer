@@ -21,14 +21,14 @@ fi
 RandNum=$((1 + $RANDOM % 5000))
 
 # Check if server is already started
-if [ "$ViewManager" == "screen" ]; then
+if [ "viewmanager" == "screen" ]; then
   ScreenWipe=$(screen -wipe 2>&1)
   if screen -list | grep -q '\.servername\s'; then
     echo "Server is already started!"
     echo "Press screen -r servername to open it"
     exit 1
   fi
-elif [ "$ViewManager" == "tmux" ]; then
+elif [ "viewmanager" == "tmux" ]; then
   TmuxWipe=$(tmux list-sessions 2>&1)
   nohup tmux attach -t MinecraftBedrockServer:0 > /dev/null 2>&1 && tmux detach
   if tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^MinecraftBedrockServer: servername"; then
@@ -184,10 +184,10 @@ if [ -z "$ContentLogging" ]; then
     echo "# Enables logging content errors to a file" >> dirname/minecraftbe/servername/server.properties
 fi
 
-if [ "$ViewManager" == "screen" ]; then
+if [ "viewmanager" == "screen" ]; then
   echo "Starting Minecraft server. To view window type screen -r servername"
   echo "To minimize the window and let the server run in the background, press Ctrl+A then Ctrl+D"
-elif [ "$ViewManager" == "tmux" ]; then
+elif [ "viewmanager" == "tmux" ]; then
   echo "Starting Minecraft server. To view window type tmux attach -t MinecraftBedrockServer -c servername"
   echo "To minimize the window and let the server run in the background, press Ctrl+B+D"
 fi
@@ -210,9 +210,9 @@ else
     echo "gawk application was not found -- timestamps will not be available in the logs.  Please delete SetupMinecraft.sh and run the script the new recommended way!"
 fi
 
-if [ "$ViewManager" == "screen" ]; then
+if [ "viewmanager" == "screen" ]; then
   screen -L -Logfile logs/servername.$(date +%Y.%m.%d.%H.%M.%S).log -dmS servername /bin/bash -c "${BASH_CMD}"
-elif [ "$ViewManager" == "tmux" ]; then
+elif [ "viewmanager" == "tmux" ]; then
   export LOG_FILE="logs/servername.$(date +%Y.%m.%d.%H.%M.%S).log"
   (
     while [ ! -e "$LOG_FILE" ]; do sleep 1; done
