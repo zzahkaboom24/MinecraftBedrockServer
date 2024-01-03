@@ -20,14 +20,15 @@ fi
 # Check if server is running
 if [ "$ViewManager" == "screen" ]; then
   if ! screen -list | grep -q '\.servername\s'; then
-  echo "Server is not currently running!"
-  exit 1
+    echo "Server is not currently running!"
+    exit 1
   fi
 elif [ "$ViewManager" == "tmux" ]; then
   nohup tmux attach -t MinecraftBedrockServer:0 > /dev/null 2>&1 && tmux detach
   if ! tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^MinecraftBedrockServer: servername"; then
-  echo "Server is not currently running!"
-  exit 1
+    echo "Server is not currently running!"
+    exit 1
+  fi
 fi
 
 # Get an optional custom countdown time (in minutes)
