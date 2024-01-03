@@ -511,16 +511,30 @@ sudo systemctl start "$ServerName.service"
 # Wait up to 30 seconds for server to start
 StartChecks=0
 while [[ $StartChecks -lt 30 ]]; do
-  if screen -list | grep -q "\.$ServerName\s"; then
-    break
+  if [ viewmanager == screen ]; then
+    if screen -list | grep -q "\.$ServerName\s"; then
+      break
+    fi
+    sleep 1
+    StartChecks=$((StartChecks + 1))
+  elif [ viewmanager == tmux ]; then
+    if tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^MinecraftBedrockServer: servername"; then
+      break
+    fi
+    sleep 1
+    StartChecks=$((StartChecks + 1))
   fi
-  sleep 1
-  StartChecks=$((StartChecks + 1))
 done
 
 # Force quit if server is still open
-if ! screen -list | grep -q "\.$ServerName\s"; then
-  echo "Minecraft server failed to start after 20 seconds."
-else
-  echo "Minecraft server has started.  Type screen -r $ServerName to view the running server!"
-fi
+if [viewmanager == screen ]; then
+  if ! screen -list | grep -q "\.$ServerName\s"; then
+    echo "Minecraft server failed to start after 20 seconds."
+  else
+    echo "Minecraft server has started. Type screen -r $ServerName to view the running server!"
+  fi
+elif [ viewmanager == tmux ]; then
+  if ! tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^MinecraftBedrockServer: servername"; then
+    echo "Minecraft server failed to start after 20 seconds."
+  else
+    echo "Minecraft server has started. Type tmux attach -t MinecraftBedrockServer:0 to view the running server!"
