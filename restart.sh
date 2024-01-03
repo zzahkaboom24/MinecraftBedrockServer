@@ -53,7 +53,7 @@ if [ "viewmanager" == "screen" ]; then
   screen -Rd servername -X stuff "say Closing server...$(printf '\r')"
   screen -Rd servername -X stuff "stop$(printf '\r')"
 elif [ "viewmanager" == "tmux" ]; then
-  tmux attach -d -t servername:0
+  tmux attach -d -t servername:0.0
   tmux send-keys "echo Server is restarting in 30 seconds!" C-m
   tmux send-keys 'sleep 23s' C-m
   tmux send-keys "echo Server is restarting in 7 seconds!" C-m
