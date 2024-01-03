@@ -96,6 +96,10 @@ Update_Scripts() {
   # Remove existing scripts
   rm -f start.sh stop.sh restart.sh fixpermissions.sh revert.sh
 
+  sleep 5
+  echo $ViewManager$ViewManager$ViewManager$ViewManager$ViewManager$ViewManager
+  sleep 5
+
   # Download start.sh from repository
   echo "Grabbing start.sh from repository..."
   curl -H "Accept-Encoding: identity" -L -o start.sh https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/start.sh
