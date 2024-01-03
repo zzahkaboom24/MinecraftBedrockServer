@@ -190,6 +190,7 @@ if [ "$ViewManager" == "screen" ]; then
 elif [ "$ViewManager" == "tmux" ]; then
   echo "Starting Minecraft server. To view window type tmux attach -t MinecraftBedrockServer -c servername"
   echo "To minimize the window and let the server run in the background, press Ctrl+B+D"
+fi
 
 CPUArch=$(uname -m)
 if [[ "$CPUArch" == *"aarch64"* ]]; then
