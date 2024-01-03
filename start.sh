@@ -194,7 +194,7 @@ fi
 
 CPUArch=$(uname -m)
 if [[ "$CPUArch" == *"aarch64"* ]]; then
-    cd dirname/minecraftbe/servername
+    cd dirname/minecraftbe/servername || exit
     if [ -n "$(which box64)" ]; then
         BASH_CMD="box64 bedrock_server"
     else
@@ -207,15 +207,15 @@ fi
 if [ "viewmanager" == "screen" ]; then
   if command -v gawk &>/dev/null; then
       BASH_CMD+=$' | gawk \'{ print strftime(\"[%Y-%m-%d %H:%M:%S]\"), $0 }\''
-      screen -L -Logfile logs/servername.$(date +%Y.%m.%d.%H.%M.%S).log -dmS servername /bin/bash -c "${BASH_CMD}"
+      screen -L -Logfile "logs/servername.$(date +%Y.%m.%d.%H.%M.%S).log" -dmS servername /bin/bash -c "${BASH_CMD}"
   else
       echo "gawk application was not found -- timestamps will not be available in the logs.  Please delete SetupMinecraft.sh and run the script the new recommended way!"
-      screen -L -Logfile logs/servername.$(date +%Y.%m.%d.%H.%M.%S).log -dmS servername /bin/bash -c "${BASH_CMD}"
+      screen -L -Logfile "logs/servername.$(date +%Y.%m.%d.%H.%M.%S).log" -dmS servername /bin/bash -c "${BASH_CMD}"
   fi
 elif [ "viewmanager" == "tmux" ]; then
   if command -v gawk &>/dev/null; then
-      BASH_CMD+=" | gawk '{ print strftime(\"[%Y-%m-%d %H:%M:%S]\"), \$0 }' > >(tee -a \$LOG_FILE) 2>&1"
       export LOG_FILE="logs/servername.$(date +%Y.%m.%d.%H.%M.%S).log"
+      BASH_CMD+=" | tee $LOG_FILE"
       (
         while [ ! -e "$LOG_FILE" ]; do sleep 1; done
         tmux detach
@@ -225,7 +225,7 @@ elif [ "viewmanager" == "tmux" ]; then
       tmux attach -t MinecraftBedrockServer \; \
         send-keys 'tmux set -g status-left ""' C-m \; \
         send-keys 'clear' C-m \; \
-        send-keys '/bin/bash -c "${BASH_CMD}" > >(tee -a $LOG_FILE) 2>&1' C-m 
+        send-keys "/bin/bash -c \"${BASH_CMD}\"" C-m 
   else
       echo "gawk application was not found -- timestamps will not be available in the logs. Please delete SetupMinecraft.sh and run the script the new recommended way!"
       export LOG_FILE="logs/servername.$(date +%Y.%m.%d.%H.%M.%S).log"
@@ -238,6 +238,6 @@ elif [ "viewmanager" == "tmux" ]; then
       tmux attach -t MinecraftBedrockServer \; \
         send-keys 'tmux set -g status-left ""' C-m \; \
         send-keys 'clear' C-m \; \
-        send-keys '/bin/bash -c "${BASH_CMD}" > >(tee -a $LOG_FILE) 2>&1' C-m 
+        send-keys "/bin/bash -c \"${BASH_CMD}\" > >(tee -a $LOG_FILE) 2>&1" C-m 
   fi
 fi
