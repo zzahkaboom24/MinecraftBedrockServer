@@ -221,11 +221,11 @@ elif [ "viewmanager" == "tmux" ]; then
         tmux detach
       ) &
   
-      tmux new-session -d -s MinecraftBedrockServer -n servername
-      tmux attach -t MinecraftBedrockServer \; \
-        send-keys 'tmux set -g status-left ""' C-m \; \
-        send-keys 'clear' C-m \; \
-        send-keys "/bin/bash -c \"${BASH_CMD}\"" C-m 
+      tmux new-session -d -s servername -n console
+      tmux send-keys -t servername:0 'tmux split-window -h' C-m
+      tmux send-keys -t servername:0.0 'tmux set -g status-left ""' C-m
+      tmux send-keys -t servername:0.0 'clear' C-m
+      tmux send-keys -t servername:0.0 "/bin/bash -c \"${BASH_CMD}\" > >(tee -a $LOG_FILE) 2>&1" C-m
   else
       echo "gawk application was not found -- timestamps will not be available in the logs. Please delete SetupMinecraft.sh and run the script the new recommended way!"
       export LOG_FILE="logs/servername.$(date +%Y.%m.%d.%H.%M.%S).log"
@@ -234,10 +234,10 @@ elif [ "viewmanager" == "tmux" ]; then
         tmux detach
       ) &
   
-      tmux new-session -d -s MinecraftBedrockServer -n servername
-      tmux attach -t MinecraftBedrockServer \; \
-        send-keys 'tmux set -g status-left ""' C-m \; \
-        send-keys 'clear' C-m \; \
-        send-keys "/bin/bash -c \"${BASH_CMD}\" > >(tee -a $LOG_FILE) 2>&1" C-m 
+      tmux new-session -d -s servername -n console
+      tmux send-keys -t servername:0 'tmux split-window -h' C-m
+      tmux send-keys -t servername:0.0 'tmux set -g status-left ""' C-m
+      tmux send-keys -t servername:0.0 'clear' C-m
+      tmux send-keys -t servername:0.0 "/bin/bash -c \"${BASH_CMD}\" > >(tee -a $LOG_FILE) 2>&1" C-m
   fi
 fi
