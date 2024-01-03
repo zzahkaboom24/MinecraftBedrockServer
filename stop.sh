@@ -92,13 +92,14 @@ while [[ $CountdownTime -gt 0 ]]; do
   echo "Waiting for $CountdownTime more minutes ..."
 done
 echo "Stopping Minecraft server ..."
+
 if [ "$ViewManager" == "screen" ]; then
   screen -Rd servername -X stuff "say Stopping server (stop.sh called)...$(printf '\r')"
   screen -Rd servername -X stuff "stop$(printf '\r')"
 elif [ "$ViewManager" == "tmux" ]; then
   tmux attach -d -t MinecraftBedrockServer:0 \; \
   send-keys "echo Stopping server (stop.sh called)..." C-m \; \
-  send-keys 'stop' C-m \; \
+  send-keys 'stop' C-m
 fi
 
 # Wait up to 20 seconds for server to close
