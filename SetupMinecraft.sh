@@ -436,6 +436,8 @@ read_with_prompt PortIPV4 "Server IPV4 Port" 19132
 echo "Enter server IPV6 port (default 19133): "
 read_with_prompt PortIPV6 "Server IPV6 Port" 19133
 
+export console_command
+
 if [ -d "$ServerName" ]; then
   echo "Directory minecraftbe/$ServerName already exists!  Updating scripts and configuring service ..."
 
