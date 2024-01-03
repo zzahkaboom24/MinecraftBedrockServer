@@ -24,7 +24,7 @@ if [ "viewmanager" == "screen" ]; then
     exit 1
   fi
 elif [ "viewmanager" == "tmux" ]; then
-  if ! tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^MinecraftBedrockServer: servername"; then
+  if ! tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^servername: console"; then
     echo "Server is not currently running!"
     exit 1
   fi
@@ -53,25 +53,25 @@ if [ "viewmanager" == "screen" ]; then
   screen -Rd servername -X stuff "say Closing server...$(printf '\r')"
   screen -Rd servername -X stuff "stop$(printf '\r')"
 elif [ "viewmanager" == "tmux" ]; then
-  tmux attach -d -t MinecraftBedrockServer:0 \; \
-  send-keys "echo Server is restarting in 30 seconds!" C-m \; \
-  send-keys 'sleep 23s' C-m \; \
-  send-keys "echo Server is restarting in 7 seconds!" C-m \; \
-  send-keys 'sleep 1s' C-m \; \
-  send-keys "echo Server is restarting in 6 seconds!" C-m \; \
-  send-keys 'sleep 1s' C-m \; \
-  send-keys "echo Server is restarting in 5 seconds!" C-m \; \
-  send-keys 'sleep 1s' C-m \; \
-  send-keys "echo Server is restarting in 4 seconds!" C-m \; \
-  send-keys 'sleep 1s' C-m \; \
-  send-keys "echo Server is restarting in 3 seconds!" C-m \; \
-  send-keys 'sleep 1s' C-m \; \
-  send-keys "echo Server is restarting in 2 seconds!" C-m \; \
-  send-keys 'sleep 1s' C-m \; \
-  send-keys "echo Server is restarting in 1 second!" C-m \; \
-  send-keys 'sleep 1s' C-m \; \
-  send-keys "echo Closing server..." C-m \; \
-  send-keys 'stop' C-m
+  tmux attach -d -t servername:0
+  tmux send-keys "echo Server is restarting in 30 seconds!" C-m
+  tmux send-keys 'sleep 23s' C-m
+  tmux send-keys "echo Server is restarting in 7 seconds!" C-m
+  tmux send-keys 'sleep 1s' C-m
+  tmux send-keys "echo Server is restarting in 6 seconds!" C-m
+  tmux send-keys 'sleep 1s' C-m
+  tmux send-keys "echo Server is restarting in 5 seconds!" C-m
+  tmux send-keys 'sleep 1s' C-m
+  tmux send-keys "echo Server is restarting in 4 seconds!" C-m
+  tmux send-keys 'sleep 1s' C-m
+  tmux send-keys "echo Server is restarting in 3 seconds!" C-m
+  tmux send-keys 'sleep 1s' C-m
+  tmux send-keys "echo Server is restarting in 2 seconds!" C-m
+  tmux send-keys 'sleep 1s' C-m
+  tmux send-keys "echo Server is restarting in 1 second!" C-m
+  tmux send-keys 'sleep 1s' C-m
+  tmux send-keys "echo Closing server..." C-m
+  tmux send-keys 'stop' C-m
 if
 
 echo "Closing server..."
@@ -85,7 +85,7 @@ while [[ $StopChecks -lt 30 ]]; do
     sleep 1
     StopChecks=$((StopChecks + 1))
   elif [ "viewmanager" == "tmux" ]; then
-    if ! tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^MinecraftBedrockServer: servername"; then
+    if ! tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^servername: console"; then
       break
     fi
     sleep 1
@@ -101,10 +101,10 @@ if [ "viewmanager" == "screen" ]; then
     sleep 10
   fi
 elif [ "viewmanager" == "tmux" ]; then
-  if tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^MinecraftBedrockServer: servername"; then
+  if tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^servername: console"; then
     # Server still hasn't stopped after 30s, tell Tmux to close it
     echo "Minecraft server still hasn't closed after 30 seconds, closing tmux manually"
-    tmux kill-session -t MinecraftBedrockServer
+    tmux kill-session -t servername
     sleep 10
   fi
 fi
