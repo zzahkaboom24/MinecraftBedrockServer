@@ -463,7 +463,7 @@ if [ -d "$ServerName" ]; then
   if [ "$ViewManager" == "screen" ]; then
     console_command="screen -r $ServerName"
   elif [ "$ViewManager" == "tmux" ]; then
-    console_command="tmux attach -t $ServerName"
+    console_command="tmux attach -t MinecraftBedrockServer:0"
   fi
 
   # Setup completed
@@ -507,8 +507,6 @@ Fix_Permissions
 # Finished!
 echo "Setup is complete.  Starting Minecraft $ServerName server." 
 echo "To view the console either use the following command:"
-echo "ViewManager: $ViewManager" //tmp
-echo "ServerName: $ServerName" //tmp
 echo "$console_command"
 echo "or check the logs folder if the server fails to start."
 sudo systemctl daemon-reload
