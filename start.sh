@@ -30,10 +30,10 @@ if [ "viewmanager" == "screen" ]; then
   fi
 elif [ "viewmanager" == "tmux" ]; then
   TmuxWipe=$(tmux list-sessions 2>&1)
-  nohup tmux attach -t MinecraftBedrockServer:0 > /dev/null 2>&1 && tmux detach
-  if tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^MinecraftBedrockServer: servername"; then
+  nohup tmux attach -t servername:0 > /dev/null 2>&1 && tmux detach
+  if tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^servername: console"; then
     echo "Server is already started!"
-    echo "Press tmux attach -t MinecraftBedrockServer -c servername to open it"
+    echo "Press tmux attach -t servername -c console to open it"
     exit 1
   fi
 fi
@@ -188,7 +188,7 @@ if [ "viewmanager" == "screen" ]; then
   echo "Starting Minecraft server. To view window type screen -r servername"
   echo "To minimize the window and let the server run in the background, press Ctrl+A then Ctrl+D"
 elif [ "viewmanager" == "tmux" ]; then
-  echo "Starting Minecraft server. To view window type tmux attach -t MinecraftBedrockServer -c servername"
+  echo "Starting Minecraft server. To view window type tmux attach -t servername -c console"
   echo "To minimize the window and let the server run in the background, press Ctrl+B+D"
 fi
 
