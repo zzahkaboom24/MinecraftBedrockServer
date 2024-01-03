@@ -129,6 +129,7 @@ elif [ "$ViewManager" == "tmux" ]; then
   if tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^MinecraftBedrockServer: servername"; then
   echo "Minecraft server still hasn't stopped after 20 seconds, closing screen manually"
   tmux kill-session -t MinecraftBedrockServer
+  fi
 fi
 
 echo "Minecraft server servername stopped."
