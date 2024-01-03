@@ -69,6 +69,8 @@ if [ ! -d "$DirName" ]; then
   DirName=~
 fi
 
+export ViewManager
+
 while true; do
   echo "Do you want to use 'screen' or 'tmux'? (default 'screen'): "
   echo "Type 'screen' or 'tmux' to choose between one or the other. Leave the input blank to default back to 'screen'"
