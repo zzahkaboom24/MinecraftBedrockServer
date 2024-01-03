@@ -465,8 +465,6 @@ if [ -d "$ServerName" ]; then
   # Setup completed
   echo "Setup is complete.  Starting Minecraft $ServerName server."
   echo "To view the console either use the following command:"
-  echo "ViewManager: $ViewManager" //tmp
-  echo "ServerName: $ServerName" //tmp
   echo "$console_command"
   echo "or check the logs folder if the server fails to start"
   sudo systemctl daemon-reload
@@ -505,6 +503,8 @@ Fix_Permissions
 # Finished!
 echo "Setup is complete.  Starting Minecraft $ServerName server." 
 echo "To view the console either use the following command:"
+echo "ViewManager: $ViewManager" //tmp
+echo "ServerName: $ServerName" //tmp
 echo "$console_command"
 echo "or check the logs folder if the server fails to start."
 sudo systemctl daemon-reload
