@@ -224,7 +224,7 @@ elif [ "viewmanager" == "tmux" ]; then
       tmux new-session -d -s servername -n console
       tmux send-keys -t servername:0 'tmux split-window -h' C-m
       tmux send-keys -t servername:0.0 'tmux set -g status-left ""' C-m
-      tmux send-keys -t servername:0.0 'clear' C-m
+      tmux send-keys -t servername:0.0 C-l
       tmux send-keys -t servername:0.0 "/bin/bash -c \"${BASH_CMD}\" > >(tee -a $LOG_FILE) 2>&1" C-m
   else
       echo "gawk application was not found -- timestamps will not be available in the logs. Please delete SetupMinecraft.sh and run the script the new recommended way!"
@@ -237,7 +237,7 @@ elif [ "viewmanager" == "tmux" ]; then
       tmux new-session -d -s servername -n console
       tmux send-keys -t servername:0 'tmux split-window -h' C-m
       tmux send-keys -t servername:0.0 'tmux set -g status-left ""' C-m
-      tmux send-keys -t servername:0.0 'clear' C-m
+      tmux send-keys -t servername:0.0 C-l
       tmux send-keys -t servername:0.0 "/bin/bash -c \"${BASH_CMD}\" > >(tee -a $LOG_FILE) 2>&1" C-m
   fi
 fi
