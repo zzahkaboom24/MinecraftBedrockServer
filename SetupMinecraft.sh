@@ -111,6 +111,7 @@ Update_Scripts() {
   sed -i "s:dirname:$DirName:g" stop.sh
   sed -i "s:servername:$ServerName:g" stop.sh
   sed -i "s:userxname:$UserName:g" stop.sh
+  sed -i "s:viewmanager:$ViewManager:g" stop.sh
   sed -i "s<pathvariable<$PATH<g" stop.sh
 
   # Download restart.sh from repository
@@ -120,6 +121,7 @@ Update_Scripts() {
   sed -i "s:dirname:$DirName:g" restart.sh
   sed -i "s:servername:$ServerName:g" restart.sh
   sed -i "s:userxname:$UserName:g" restart.sh
+  sed -i "s:viewmanager:$ViewManager:g" restart.sh
   sed -i "s<pathvariable<$PATH<g" restart.sh
 
   # Download fixpermissions.sh from repository
@@ -129,6 +131,7 @@ Update_Scripts() {
   sed -i "s:dirname:$DirName:g" fixpermissions.sh
   sed -i "s:servername:$ServerName:g" fixpermissions.sh
   sed -i "s:userxname:$UserName:g" fixpermissions.sh
+  sed -i "s:viewmanager:$ViewManager:g" fixpermissions.sh
   sed -i "s<pathvariable<$PATH<g" fixpermissions.sh
 
   # Download revert.sh from repository
@@ -138,6 +141,7 @@ Update_Scripts() {
   sed -i "s:dirname:$DirName:g" revert.sh
   sed -i "s:servername:$ServerName:g" revert.sh
   sed -i "s:userxname:$UserName:g" revert.sh
+  sed -i "s:viewmanager:$ViewManager:g" revert.sh
   sed -i "s<pathvariable<$PATH<g" revert.sh
 
   # Download clean.sh from repository
@@ -147,6 +151,7 @@ Update_Scripts() {
   sed -i "s:dirname:$DirName:g" clean.sh
   sed -i "s:servername:$ServerName:g" clean.sh
   sed -i "s:userxname:$UserName:g" clean.sh
+  sed -i "s:viewmanager:$ViewManager:g" clean.sh
   sed -i "s<pathvariable<$PATH<g" clean.sh
 
   # Download update.sh from repository
