@@ -9,9 +9,10 @@
 #
 # GitHub Repository: https://github.com/TheRemote/MinecraftBedrockServer
 
+echo ""
 echo "Minecraft Bedrock Server installation script by James A. Chambers"
 echo "Latest version always at https://github.com/TheRemote/MinecraftBedrockServer"
-echo "Don't forget to set up port forwarding on your router!  The default port is 19132"
+echo "Don't forget to set up port forwarding on your router! The default port is 19132"
 
 # Randomizer for user agent
 RandNum=$(echo $((1 + $RANDOM % 5000)))
