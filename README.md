@@ -28,7 +28,7 @@ If you are looking for a Docker containerized version of the Minecraft Bedrock D
 To run the installation type:<br>
 
 ```bash
-curl https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/SetupMinecraft.sh | bash
+curl -sS https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/SetupMinecraft.sh | bash
 ```
 
 <h2>Installation Guide</h2>
