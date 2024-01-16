@@ -8,12 +8,14 @@ PathLength=${#USERPATH}
 if [[ "$PathLength" -gt 12 ]]; then
   PATH="$USERPATH"
 else
-  echo "Unable to set path variable.  You likely need to download an updated version of SetupMinecraft.sh from GitHub!"
+  echo "Unable to set path variable."
+  echo "You likely need to download an updated version of SetupMinecraft.sh from GitHub!"
 fi
 
 # Check to make sure we aren't running as root
 if [[ $(id -u) = 0 ]]; then
-  echo "This script is not meant to be run as root. Please run ./restart.sh as a non-root user, without sudo;  Exiting..."
+  echo "This script is not meant to be run as root."
+  echo "Please run ./restart.sh as a non-root user, without sudo;  Exiting..."
   exit 1
 fi
 
@@ -53,23 +55,23 @@ if [ "viewmanager" == "screen" ]; then
   screen -Rd servername -X stuff "say Closing server...$(printf '\r')"
   screen -Rd servername -X stuff "stop$(printf '\r')"
 elif [ "viewmanager" == "tmux" ]; then
-  tmux send-keys -t servername:0.0 "echo Server is restarting in 30 seconds!" C-m
-  tmux send-keys -t servername:0.0 'sleep 23s' C-m
-  tmux send-keys -t servername:0.0 "echo Server is restarting in 7 seconds!" C-m
-  tmux send-keys -t servername:0.0 'sleep 1s' C-m
-  tmux send-keys -t servername:0.0 "echo Server is restarting in 6 seconds!" C-m
-  tmux send-keys -t servername:0.0 'sleep 1s' C-m
-  tmux send-keys -t servername:0.0 "echo Server is restarting in 5 seconds!" C-m
-  tmux send-keys -t servername:0.0 'sleep 1s' C-m
-  tmux send-keys -t servername:0.0 "echo Server is restarting in 4 seconds!" C-m
-  tmux send-keys -t servername:0.0 'sleep 1s' C-m
-  tmux send-keys -t servername:0.0 "echo Server is restarting in 3 seconds!" C-m
-  tmux send-keys -t servername:0.0 'sleep 1s' C-m
-  tmux send-keys -t servername:0.0 "echo Server is restarting in 2 seconds!" C-m
-  tmux send-keys -t servername:0.0 'sleep 1s' C-m
-  tmux send-keys -t servername:0.0 "echo Server is restarting in 1 second!" C-m
-  tmux send-keys -t servername:0.0 'sleep 1s' C-m
-  tmux send-keys -t servername:0.0 "echo Closing server..." C-m
+  tmux send-keys -t servername:0.0 "say Server is restarting in 30 seconds!" C-m
+  sleep 23s
+  tmux send-keys -t servername:0.0 "say Server is restarting in 7 seconds!" C-m
+  sleep 1s
+  tmux send-keys -t servername:0.0 "say Server is restarting in 6 seconds!" C-m
+  sleep 1s
+  tmux send-keys -t servername:0.0 "say Server is restarting in 5 seconds!" C-m
+  sleep 1s
+  tmux send-keys -t servername:0.0 "say Server is restarting in 4 seconds!" C-m
+  sleep 1s
+  tmux send-keys -t servername:0.0 "say Server is restarting in 3 seconds!" C-m
+  sleep 1s
+  tmux send-keys -t servername:0.0 "say Server is restarting in 2 seconds!" C-m
+  sleep 1s
+  tmux send-keys -t servername:0.0 "say Server is restarting in 1 second!" C-m
+  sleep 1s
+  tmux send-keys -t servername:0.0 "say Closing server..." C-m
   tmux send-keys -t servername:0.0 'stop' C-m
 if
 
