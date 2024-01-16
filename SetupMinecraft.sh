@@ -43,7 +43,7 @@ function read_with_prompt {
     if [[ -z ${!variable_name} ]] && [[ -n "$default" ]]; then
       declare -g "$variable_name"="$default"
     fi
-    echo -n "$prompt : ${!variable_name} -- accept (y/n)?"
+    echo -n "$prompt: ${!variable_name} -- accept (y/n)? "
     read answer </dev/tty
     if [[ "$answer" == "${answer#[Yy]}" ]]; then
       unset "$variable_name"
@@ -72,6 +72,7 @@ fi
 export ViewManager
 
 while true; do
+  echo ""
   echo "Do you want to use 'screen' or 'tmux'? (default 'screen'): "
   echo "Type 'screen' or 'tmux' to choose between one or the other. Leave the input blank to default back to 'screen'"
   read_with_prompt ViewManager "View Manager" screen
@@ -177,6 +178,7 @@ Update_Service() {
   fi
 
   sudo systemctl daemon-reload
+  echo ""
   echo -n "Start Minecraft server at startup automatically (y/n)?"
   read answer </dev/tty
   if [[ "$answer" != "${answer#[Yy]}" ]]; then
@@ -184,8 +186,9 @@ Update_Service() {
     # Automatic reboot at 4am configuration
     TimeZone=$(cat /etc/timezone)
     CurrentTime=$(date)
-    echo "Your time zone is currently set to $TimeZone.  Current system time: $CurrentTime"
+    echo "Your time zone is currently set to $TimeZone. Current system time: $CurrentTime"
     echo "You can adjust/remove the selected reboot time later by typing crontab -e or running SetupMinecraft.sh again."
+    echo ""
     echo -n "Automatically restart and backup server at 4am daily (y/n)?"
     read answer </dev/tty
     if [[ "$answer" != "${answer#[Yy]}" ]]; then
@@ -416,6 +419,7 @@ else
 fi
 
 # Server name configuration
+echo ""
 echo "Enter a short one word label for a new or existing server (don't use minecraftbe)..."
 echo "It will be used in the folder name and service name..."
 read_with_prompt ServerName "Server Label"
@@ -434,9 +438,11 @@ elif [ "$ViewManager" == "tmux" ]; then
   console_command="tmux attach -t $ServerName:0.0"
 fi
 
+echo ""
 echo "Enter server IPV4 port (default 19132): "
 read_with_prompt PortIPV4 "Server IPV4 Port" 19132
 
+echo ""
 echo "Enter server IPV6 port (default 19133): "
 read_with_prompt PortIPV6 "Server IPV6 Port" 19133
 
@@ -465,7 +471,7 @@ if [ -d "$ServerName" ]; then
   Fix_Permissions
 
   # Setup completed
-  echo "Setup is complete.  Starting Minecraft $ServerName server."
+  echo "Setup is complete. Starting Minecraft $ServerName server."
   echo "To view the console either use the following command:"
   echo "$console_command"
   echo "or check the logs folder if the server fails to start"
@@ -533,12 +539,14 @@ if [ "$ViewManager" == "screen" ]; then
   if ! screen -list | grep -q "\.$ServerName\s"; then
     echo "Minecraft server failed to start after 20 seconds."
   else
+    echo ""
     echo "Minecraft server has started. Type screen -r $ServerName to view the running server!"
   fi
 elif [ "$ViewManager" == "tmux" ]; then
   if ! tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^$ServerName: console"; then
     echo "Minecraft server failed to start after 20 seconds."
   else
+    echo ""
     echo "Minecraft server has started. Type tmux attach -t $ServerName:0.0 console to view the running server!"
   fi
 fi
