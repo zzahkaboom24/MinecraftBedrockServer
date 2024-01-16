@@ -11,7 +11,8 @@ PathLength=${#USERPATH}
 if [[ "$PathLength" -gt 12 ]]; then
     PATH="$USERPATH"
 else
-    echo "Unable to set path variable.  You likely need to download an updated version of SetupMinecraft.sh from GitHub!"
+    echo "Unable to set path variable."
+    echo "You likely need to download an updated version of SetupMinecraft.sh from GitHub!"
 fi
 
 ls -r1 dirname/minecraftbe/servername/downloads/ | grep bedrock-server | head -2 | tail -1 >version_pin.txt
