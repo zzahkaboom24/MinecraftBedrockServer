@@ -299,12 +299,19 @@ Check_Architecture() {
   echo "System Architecture: $CPUArch"
 
   # Check for ARM architecture
-  if [[ "$CPUArch" == *"aarch"* ]]; then
+  if [[ "$CPUArch" == *"aarch"* && "$CPUArch" != "aarch64" ]]; then
     # ARM architecture detected -- download QEMU and dependency libraries
     echo "aarch64 platform detected -- installing box64..."
     GetList=$(sudo curl -sSL -k -o /etc/apt/sources.list.d/box64.list https://ryanfortner.github.io/box64-debs/box64.list)
     GetKey=$(sudo curl -sSL -k https://ryanfortner.github.io/box64-debs/KEY.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/box64-debs-archive-keyring.gpg)
     sudo DEBIAN_FRONTEND=noninteractive apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install box64-rpi4arm64 -y
+  elif [[ "$CPUArch" == "aarch64" ]]; then
+    # ARM64 architecture detected -- download QEMU and dependency libraries
+    echo "aarch64 platform detected -- installing box64..."
+    GetList=$(sudo curl -sSL -k -o /etc/apt/sources.list.d/box64.list https://ryanfortner.github.io/box64-debs/box64.list)
+    GetKey=$(sudo curl -sSL -k https://ryanfortner.github.io/box64-debs/KEY.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/box64-debs-archive-keyring.gpg)
+    sudo DEBIAN_FRONTEND=noninteractive apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install box64-arm64 -y
+  fi
 
     if [ -n "$(which box64)" ]; then
       echo "box64 installed successfully"
