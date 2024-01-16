@@ -57,6 +57,7 @@ function read_with_prompt {
 # It is meant to point to the root folder that holds all servers
 # For example if you had a separate drive mounted at /newdrive you would use DirName='/newdrive' for all servers
 # The servers will be separated by their name/label into folders
+echo ""
 echo "Enter directory path to install Minecraft BE Server to (default ~): "
 read_with_prompt DirName "Directory Path" ~
 # If DirName is not an absolute path, prepend the home directory
@@ -179,17 +180,18 @@ Update_Service() {
 
   sudo systemctl daemon-reload
   echo ""
-  echo -n "Start Minecraft server at startup automatically (y/n)?"
+  echo -n "Start Minecraft server at startup automatically (y/n)? "
   read answer </dev/tty
   if [[ "$answer" != "${answer#[Yy]}" ]]; then
     sudo systemctl enable $ServerName.service
     # Automatic reboot at 4am configuration
     TimeZone=$(cat /etc/timezone)
     CurrentTime=$(date)
-    echo "Your time zone is currently set to $TimeZone. Current system time: $CurrentTime"
+    echo "Your time zone is currently set to $TimeZone."
+    echo "Current system time: $CurrentTime"
     echo "You can adjust/remove the selected reboot time later by typing crontab -e or running SetupMinecraft.sh again."
     echo ""
-    echo -n "Automatically restart and backup server at 4am daily (y/n)?"
+    echo -n "Automatically restart and backup server at 4am daily (y/n)? "
     read answer </dev/tty
     if [[ "$answer" != "${answer#[Yy]}" ]]; then
       croncmd="$DirName/minecraftbe/$ServerName/restart.sh 2>&1"
@@ -198,12 +200,14 @@ Update_Service() {
         crontab -l | grep -v -F "$croncmd"
         echo "$cronjob"
       ) | crontab -
-      echo "Daily restart scheduled.  To change time or remove automatic restart type crontab -e"
+      echo "Daily restart scheduled."
+      echo "To change time or remove automatic restart type crontab -e."
     fi
   fi
 }
 
 Fix_Permissions() {
+  echo ""
   echo "Setting server file permissions..."
   sudo ./fixpermissions.sh -a >/dev/null
 }
@@ -264,7 +268,7 @@ Check_Dependencies() {
     if ! command -v curl &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install curl -yqq; fi
     echo "Dependency installation completed"
   else
-    echo "Warning: apt was not found.  You may need to install curl, screen, tmux, unzip, libcurl4, openssl, libc6 and libcrypt1 with your package manager for the server to start properly!"
+    echo "Warning: apt was not found. You may need to install curl, screen, tmux, unzip, libcurl4, openssl, libc6 and libcrypt1 with your package manager for the server to start properly!"
   fi
 }
 
@@ -308,7 +312,7 @@ Check_Architecture() {
     echo "Installing QEMU..."
     QEMUVer=$(apt-cache show qemu-user-static | grep Version | awk 'NR==1{ print $2 }' | cut -c3-3)
     if [[ "$QEMUVer" -lt "3" ]]; then
-      echo "Available QEMU version is not high enough to emulate x86_64.  Please update your QEMU version."
+      echo "Available QEMU version is not high enough to emulate x86_64. Please update your QEMU version."
       exit 1
     else
       sudo DEBIAN_FRONTEND=noninteractive apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install qemu-user-static binfmt-support -yqq
@@ -332,13 +336,13 @@ Check_Architecture() {
     sudo ln -s $DirName/minecraftbe/$ServerName/ld-2.35.so /lib64/ld-linux-x86-64.so.2
   elif [[ "$CPUArch" == *"arm"* ]]; then
     # ARM architecture detected -- download QEMU and dependency libraries
-    echo "WARNING: ARM 32 platform detected -- This is not recommended.  64 bit ARM (aarch64) can use Box64 for emulation.  It is recommended to upgrade to a 64 bit OS."
+    echo "WARNING: ARM 32 platform detected -- This is not recommended. 64 bit ARM (aarch64) can use Box64 for emulation.  It is recommended to upgrade to a 64 bit OS."
     echo "Installing dependencies..."
 
     # Check if latest available QEMU version is at least 3.0 or higher
     QEMUVer=$(apt-cache show qemu-user-static | grep Version | awk 'NR==1{ print $2 }' | cut -c3-3)
     if [[ "$QEMUVer" -lt "3" ]]; then
-      echo "Available QEMU version is not high enough to emulate x86_64.  Please update your QEMU version."
+      echo "Available QEMU version is not high enough to emulate x86_64. Please update your QEMU version."
       exit
     else
       sudo DEBIAN_FRONTEND=noninteractive apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install qemu-user-static binfmt-support -yqq
@@ -365,7 +369,7 @@ Check_Architecture() {
   # Check for x86 (32 bit) architecture
   if [[ "$CPUArch" == *"i386"* || "$CPUArch" == *"i686"* ]]; then
     # 32 bit attempts have not been successful -- notify user to install 64 bit OS
-    echo "You are running a 32 bit operating system (i386 or i686) and the Bedrock Dedicated Server has only been released for 64 bit (x86_64).  If you have a 64 bit processor please install a 64 bit operating system to run the Bedrock dedicated server!"
+    echo "You are running a 32 bit operating system (i386 or i686) and the Bedrock Dedicated Server has only been released for 64 bit (x86_64). If you have a 64 bit processor please install a 64 bit operating system to run the Bedrock dedicated server!"
     exit 1
   fi
 }
@@ -379,7 +383,8 @@ Update_Sudoers() {
       AddLine=$(echo "$sudoline" | sudo tee /etc/sudoers.d/minecraftbe)
     fi
   else
-    echo "/etc/sudoers.d was not found on your system.  Please add this line to sudoers using sudo visudo:  $sudoline"
+    echo "/etc/sudoers.d was not found on your system."
+    echo "Please add this line to sudoers using sudo visudo: $sudoline"
   fi
 }
 
@@ -387,13 +392,16 @@ Update_Sudoers() {
 
 # Check to make sure we aren't running as root
 if [[ $(id -u) = 0 ]]; then
-  echo "This script is not meant to be run as root. Please run ./SetupMinecraft.sh as a non-root user, without sudo; the script will call sudo when it is needed. Exiting..."
+  echo "This script is not meant to be run as root."
+  echo "Please run ./SetupMinecraft.sh as a non-root user, without sudo."
+  echo "The script will call sudo when it is needed. Exiting..."
   exit 1
 fi
 
 if [ -e "SetupMinecraft.sh" ]; then
   rm -f "SetupMinecraft.sh"
-  echo "Local copy of SetupMinecraft.sh running.  Exiting and running online version..."
+  echo "Local copy of SetupMinecraft.sh running."
+  echo "Exiting and running online version..."
   curl -sSL https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/SetupMinecraft.sh | bash
   exit 1
 fi
@@ -428,7 +436,8 @@ read_with_prompt ServerName "Server Label"
 ServerName=$(echo "$ServerName" | tr -cd '[a-zA-Z0-9]._-')
 
 if [[ "$ServerName" == *"minecraftbe"* ]]; then
-  echo "Server label of minecraftbe is not allowed.  Please choose a different server label!"
+  echo "Server label of minecraftbe is not allowed."
+  echo "Please choose a different server label!"
   exit 1
 fi
 
@@ -449,7 +458,8 @@ read_with_prompt PortIPV6 "Server IPV6 Port" 19133
 export console_command
 
 if [ -d "$ServerName" ]; then
-  echo "Directory minecraftbe/$ServerName already exists!  Updating scripts and configuring service ..."
+  echo "Directory minecraftbe/$ServerName already exists!"
+  echo "Updating scripts and configuring service ..."
 
   # Get username
   UserName=$(whoami)
@@ -471,7 +481,8 @@ if [ -d "$ServerName" ]; then
   Fix_Permissions
 
   # Setup completed
-  echo "Setup is complete. Starting Minecraft $ServerName server."
+  echo "Setup is complete."
+  echo "Starting Minecraft $ServerName server."
   echo "To view the console either use the following command:"
   echo "$console_command"
   echo "or check the logs folder if the server fails to start"
@@ -509,7 +520,8 @@ Update_Sudoers
 Fix_Permissions
 
 # Finished!
-echo "Setup is complete.  Starting Minecraft $ServerName server." 
+echo "Setup is complete."
+echo "Starting Minecraft $ServerName server." 
 echo "To view the console either use the following command:"
 echo "$console_command"
 echo "or check the logs folder if the server fails to start."
@@ -540,13 +552,15 @@ if [ "$ViewManager" == "screen" ]; then
     echo "Minecraft server failed to start after 20 seconds."
   else
     echo ""
-    echo "Minecraft server has started. Type screen -r $ServerName to view the running server!"
+    echo "Minecraft server has started."
+    echo "Type screen -r $ServerName to view the running server!"
   fi
 elif [ "$ViewManager" == "tmux" ]; then
   if ! tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^$ServerName: console"; then
     echo "Minecraft server failed to start after 20 seconds."
   else
     echo ""
-    echo "Minecraft server has started. Type tmux attach -t $ServerName:0.0 console to view the running server!"
+    echo "Minecraft server has started."
+    echo "Type tmux attach -t $ServerName:0.0 console to view the running server!"
   fi
 fi
