@@ -24,8 +24,7 @@ if [ "viewmanager" == "screen" ]; then
     exit 1
   fi
 elif [ "viewmanager" == "tmux" ]; then
-  nohup tmux attach -t servername:0.0 > /dev/null 2>&1 && tmux detach
-  if ! tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^servername: console"; then
+  if ! tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" 2>/dev/null | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^servername: console"; then
     echo "Server is not currently running!"
     exit 1
   fi
