@@ -128,4 +128,15 @@ fi
 # minecraftuser ALL=(ALL) NOPASSWD: /bin/systemctl start yourservername
 
 # If you have added the above example sudo line to your sudoers file with 'sudo visudo' and the correct username uncomment the line below (make sure you comment out the /bin/bash dirname/minecraftbe/servername/start.sh line)
-sudo -n systemctl start servername
+
+if [ "tmux" == "screen" ]; then
+  echo "Starting Minecraft server."
+  echo "To view window type screen -r ProjectSurvival"
+  echo "To minimize the window and let the server run in the background, press Ctrl+A then Ctrl+D"
+  sudo -n systemctl start ProjectSurvival
+elif [ "tmux" == "tmux" ]; then
+  echo "Starting Minecraft server."
+  echo "To view window type tmux attach -t ProjectSurvival:0.0"
+  echo "To minimize the window and let the server run in the background, press Ctrl+B+D"
+  sudo -n systemctl start ProjectSurvival
+fi
