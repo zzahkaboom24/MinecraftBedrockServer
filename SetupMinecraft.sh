@@ -37,13 +37,13 @@ function read_with_prompt {
     raw_input="${raw_input/#\~/$HOME}"
     declare -g "$variable_name=$raw_input"
     if [ -z "$(command -v xargs)" ]; then
-      declare -g "$variable_name"=$( "${!variable_name}" | xargs)
+      declare -g "$variable_name"=$(echo "${!variable_name}" | xargs)
     fi
-    declare -g "$variable_name"=$( "${!variable_name}" | head -n1 | awk '{print $1;}' | tr -cd '[a-zA-Z0-9]._/-')
+    declare -g "$variable_name"=$(echo "${!variable_name}" | head -n1 | awk '{print $1;}' | tr -cd '[a-zA-Z0-9]._/-')
     if [[ -z ${!variable_name} ]] && [[ -n "$default" ]]; then
       declare -g "$variable_name"="$default"
     fi
-     -n "$prompt: ${!variable_name} -- accept (y/n)? "
+    echo -n "$prompt: ${!variable_name} -- accept (y/n)? "
     read answer </dev/tty
     if [[ "$answer" == "${answer#[Yy]}" ]]; then
       unset "$variable_name"
