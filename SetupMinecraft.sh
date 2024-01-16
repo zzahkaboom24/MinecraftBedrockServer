@@ -433,7 +433,7 @@ fi
 if [ "$ViewManager" == "screen" ]; then
   console_command="screen -r $ServerName"
 elif [ "$ViewManager" == "tmux" ]; then
-  console_command="tmux attach -t $ServerName -c console"
+  console_command="tmux attach -t $ServerName:0.0"
 fi
 
 echo "Enter server IPV4 port (default 19132): "
@@ -541,6 +541,6 @@ elif [ "$ViewManager" == "tmux" ]; then
   if ! tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^$ServerName: console"; then
     echo "Minecraft server failed to start after 20 seconds."
   else
-    echo "Minecraft server has started. Type tmux attach -t $ServerName -c console to view the running server!"
+    echo "Minecraft server has started. Type tmux attach -t $ServerName:0.0 console to view the running server!"
   fi
 fi
