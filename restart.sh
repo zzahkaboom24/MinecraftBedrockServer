@@ -53,25 +53,24 @@ if [ "viewmanager" == "screen" ]; then
   screen -Rd servername -X stuff "say Closing server...$(printf '\r')"
   screen -Rd servername -X stuff "stop$(printf '\r')"
 elif [ "viewmanager" == "tmux" ]; then
-  tmux attach -d -t servername:0.0
-  tmux send-keys "echo Server is restarting in 30 seconds!" C-m
-  tmux send-keys 'sleep 23s' C-m
-  tmux send-keys "echo Server is restarting in 7 seconds!" C-m
-  tmux send-keys 'sleep 1s' C-m
-  tmux send-keys "echo Server is restarting in 6 seconds!" C-m
-  tmux send-keys 'sleep 1s' C-m
-  tmux send-keys "echo Server is restarting in 5 seconds!" C-m
-  tmux send-keys 'sleep 1s' C-m
-  tmux send-keys "echo Server is restarting in 4 seconds!" C-m
-  tmux send-keys 'sleep 1s' C-m
-  tmux send-keys "echo Server is restarting in 3 seconds!" C-m
-  tmux send-keys 'sleep 1s' C-m
-  tmux send-keys "echo Server is restarting in 2 seconds!" C-m
-  tmux send-keys 'sleep 1s' C-m
-  tmux send-keys "echo Server is restarting in 1 second!" C-m
-  tmux send-keys 'sleep 1s' C-m
-  tmux send-keys "echo Closing server..." C-m
-  tmux send-keys 'stop' C-m
+  tmux send-keys -t servername:0.0 "echo Server is restarting in 30 seconds!" C-m
+  tmux send-keys -t servername:0.0 'sleep 23s' C-m
+  tmux send-keys -t servername:0.0 "echo Server is restarting in 7 seconds!" C-m
+  tmux send-keys -t servername:0.0 'sleep 1s' C-m
+  tmux send-keys -t servername:0.0 "echo Server is restarting in 6 seconds!" C-m
+  tmux send-keys -t servername:0.0 'sleep 1s' C-m
+  tmux send-keys -t servername:0.0 "echo Server is restarting in 5 seconds!" C-m
+  tmux send-keys -t servername:0.0 'sleep 1s' C-m
+  tmux send-keys -t servername:0.0 "echo Server is restarting in 4 seconds!" C-m
+  tmux send-keys -t servername:0.0 'sleep 1s' C-m
+  tmux send-keys -t servername:0.0 "echo Server is restarting in 3 seconds!" C-m
+  tmux send-keys -t servername:0.0 'sleep 1s' C-m
+  tmux send-keys -t servername:0.0 "echo Server is restarting in 2 seconds!" C-m
+  tmux send-keys -t servername:0.0 'sleep 1s' C-m
+  tmux send-keys -t servername:0.0 "echo Server is restarting in 1 second!" C-m
+  tmux send-keys -t servername:0.0 'sleep 1s' C-m
+  tmux send-keys -t servername:0.0 "echo Closing server..." C-m
+  tmux send-keys -t servername:0.0 'stop' C-m
 if
 
 echo "Closing server..."
