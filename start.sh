@@ -15,7 +15,8 @@ fi
 # Check to make sure we aren't running as root
 if [[ $(id -u) = 0 ]]; then
     echo "This script is not meant to be run as root."
-    echo "Please run ./start.sh as a non-root user, without sudo;  Exiting..."
+    echo "Please run ./start.sh as a non-root user, without sudo."
+    echo "Exiting..."
     exit 1
 fi
 
@@ -103,7 +104,8 @@ echo "Checking for the latest version of Minecraft Bedrock server ..."
 # Test internet connectivity first
 curl -sSL -H "Accept-Encoding: identity" -H "Accept-Language: en" -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.$RandNum.212 Safari/537.36" -s https://www.minecraft.net/ -o /dev/null
 if [ "$?" != 0 ]; then
-    echo "Unable to connect to update website (internet connection may be down).  Skipping update ..."
+    echo "Unable to connect to update website (internet connection may be down)."
+    echo "Skipping update ..."
 else
     # Download server index.html to check latest version
 
@@ -186,10 +188,12 @@ if [ -z "$ContentLogging" ]; then
 fi
 
 if [ "viewmanager" == "screen" ]; then
-  echo "Starting Minecraft server. To view window type screen -r servername"
+  echo "Starting Minecraft server."
+  echo "To view window type screen -r servername"
   echo "To minimize the window and let the server run in the background, press Ctrl+A then Ctrl+D"
 elif [ "viewmanager" == "tmux" ]; then
-  echo "Starting Minecraft server. To view window type tmux attach -t servername:0.0"
+  echo "Starting Minecraft server."
+  echo "To view window type tmux attach -t servername:0.0"
   echo "To minimize the window and let the server run in the background, press Ctrl+B+D"
 fi
 
@@ -210,7 +214,8 @@ if [ "viewmanager" == "screen" ]; then
       BASH_CMD+=$' | gawk \'{ print strftime(\"[%Y-%m-%d %H:%M:%S]\"), $0 }\''
       screen -L -Logfile "logs/servername.$(date +%Y.%m.%d.%H.%M.%S).log" -dmS servername /bin/bash -c "${BASH_CMD}"
   else
-      echo "gawk application was not found -- timestamps will not be available in the logs.  Please delete SetupMinecraft.sh and run the script the new recommended way!"
+      echo "gawk application was not found -- timestamps will not be available in the logs."
+      echo "Please delete SetupMinecraft.sh and run the script the new recommended way!"
       screen -L -Logfile "logs/servername.$(date +%Y.%m.%d.%H.%M.%S).log" -dmS servername /bin/bash -c "${BASH_CMD}"
   fi
 elif [ "viewmanager" == "tmux" ]; then
@@ -228,7 +233,8 @@ elif [ "viewmanager" == "tmux" ]; then
       tmux send-keys -t servername:0.0 C-l
       tmux send-keys -t servername:0.0 "/bin/bash -c \"${BASH_CMD}\" > >(tee -a $LOG_FILE) 2>&1" C-m
   else
-      echo "gawk application was not found -- timestamps will not be available in the logs. Please delete SetupMinecraft.sh and run the script the new recommended way!"
+      echo "gawk application was not found -- timestamps will not be available in the logs."
+      echo "Please delete SetupMinecraft.sh and run the script the new recommended way!"
       export LOG_FILE="logs/servername.$(date +%Y.%m.%d.%H.%M.%S).log"
       (
         while [ ! -e "$LOG_FILE" ]; do sleep 1; done
