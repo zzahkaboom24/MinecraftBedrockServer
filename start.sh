@@ -188,10 +188,12 @@ if [ -z "$ContentLogging" ]; then
 fi
 
 if [ "viewmanager" == "screen" ]; then
+  echo ""
   echo "Starting Minecraft server."
   echo "To view window type screen -r servername"
   echo "To minimize the window and let the server run in the background, press Ctrl+A then Ctrl+D"
 elif [ "viewmanager" == "tmux" ]; then
+  echo ""
   echo "Starting Minecraft server."
   echo "To view window type tmux attach -t servername:0.0"
   echo "To minimize the window and let the server run in the background, press Ctrl+B+D"
