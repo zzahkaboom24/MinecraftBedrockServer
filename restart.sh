@@ -87,9 +87,19 @@ while [[ $StopChecks -lt 30 ]]; do
     sleep 1
     StopChecks=$((StopChecks + 1))
   elif [ "viewmanager" == "tmux" ]; then
-    if ! tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^servername: console"; then
+    if ! tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" 2>/dev/null | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^servername: console"; then
       break
     fi
+
+    # Checking the last line in the specified tmux pane for the output: Quit correctly; then killing the tmux session for the server if the statement is successful
+    last_line=$(tmux capture-pane -pS -1 -t servername:0.0 | awk '{line2=line1; line1=$0} END{print line2}')
+    if [ "$last_line" == "Quit correctly" ]; then
+        # Sleep for one second before killing the session
+        sleep 1
+        tmux kill-session -t servername
+        break
+    fi
+
     sleep 1
     StopChecks=$((StopChecks + 1))
   fi
@@ -103,7 +113,7 @@ if [ "viewmanager" == "screen" ]; then
     sleep 10
   fi
 elif [ "viewmanager" == "tmux" ]; then
-  if tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^servername: console"; then
+  if tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" 2>/dev/null | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^servername: console"; then
     # Server still hasn't stopped after 30s, tell Tmux to close it
     echo "Minecraft server still hasn't closed after 30 seconds, closing tmux manually"
     tmux kill-session -t servername
