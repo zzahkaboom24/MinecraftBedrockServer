@@ -66,13 +66,12 @@ while [[ $CountdownTime -gt 0 ]]; do
       sleep 10
       CountdownTime=$((CountdownTime - 1))
     elif [ "viewmanager" == "tmux" ]; then
-      tmux attach -d -t servername:0.0
-      tmux send-keys "echo Stopping server in 60 seconds..." C-m
-      tmux send-keys 'sleep 30' C-m
-      tmux send-keys "echo Stopping server in 30 seconds..." C-m
-      tmux send-keys 'sleep 20' C-m
-      tmux send-keys "echo Stopping server in 10 seconds..." C-m
-      tmux send-keys 'sleep 10' C-m
+      tmux send-keys -t servername:0.0 "echo Stopping server in 60 seconds..." C-m
+      tmux send-keys -t servername:0.0 'sleep 30' C-m
+      tmux send-keys -t servername:0.0 "echo Stopping server in 30 seconds..." C-m
+      tmux send-keys -t servername:0.0 'sleep 20' C-m
+      tmux send-keys -t servername:0.0 "echo Stopping server in 10 seconds..." C-m
+      tmux send-keys -t servername:0.0 'sleep 10' C-m
       CountdownTime=$((CountdownTime - 1))
     fi
   else
@@ -82,9 +81,8 @@ while [[ $CountdownTime -gt 0 ]]; do
       sleep 60
       CountdownTime=$((CountdownTime - 1))
     elif [ "viewmanager" == "tmux" ]; then
-      tmux attach -d -t servername:0.0
-      tmux send-keys "echo Stopping server in $CountdownTime minutes..." C-m
-      tmux send-keys 'sleep 60' C-m
+      tmux send-keys -t servername:0.0 "echo Stopping server in $CountdownTime minutes..." C-m
+      tmux send-keys -t servername:0.0 'sleep 60' C-m
       CountdownTime=$((CountdownTime - 1))
     fi
   fi
@@ -96,9 +94,8 @@ if [ "viewmanager" == "screen" ]; then
   screen -Rd servername -X stuff "say Stopping server (stop.sh called)...$(printf '\r')"
   screen -Rd servername -X stuff "stop$(printf '\r')"
 elif [ "viewmanager" == "tmux" ]; then
-  tmux attach -d -t servername:0.0
-  tmux send-keys "echo Stopping server (stop.sh called)..." C-m
-  tmux send-keys 'stop' C-m
+  tmux send-keys -t servername:0.0 "echo Stopping server (stop.sh called)..." C-m
+  tmux send-keys -t servername:0.0 'stop' C-m
 fi
 
 # Wait up to 20 seconds for server to close
