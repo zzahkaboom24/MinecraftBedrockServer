@@ -108,6 +108,11 @@ See the following links:<br>
 
 <h2>Update History</h2>
 <ul>
+  <li>January 16th 2024</li>
+  <ul>
+    <li>Full implementation of the tmux terminal multiplexer with parity to the legacy screen terminal multiplexer</li>
+    <li>Cleaned up the SetupMinecraft.sh script (and other scripts too) to hide the download progress of the curl commands, thus clearing up the script progress and making user prompts more obvious</li>
+  </ul>
   <li>October 1st 2023</li>
   <ul>
     <li>Fix gpg key import for ARM64 builds</li>
