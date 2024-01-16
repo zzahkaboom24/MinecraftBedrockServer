@@ -224,7 +224,6 @@ elif [ "viewmanager" == "tmux" ]; then
       BASH_CMD+=" | tee $LOG_FILE"
       (
         while [ ! -e "$LOG_FILE" ]; do sleep 1; done
-        tmux detach
       ) &
   
       tmux new-session -d -s servername -n console
@@ -238,7 +237,6 @@ elif [ "viewmanager" == "tmux" ]; then
       export LOG_FILE="logs/servername.$(date +%Y.%m.%d.%H.%M.%S).log"
       (
         while [ ! -e "$LOG_FILE" ]; do sleep 1; done
-        tmux detach
       ) &
   
       tmux new-session -d -s servername -n console
