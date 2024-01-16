@@ -92,8 +92,9 @@ while [[ $StopChecks -lt 30 ]]; do
     fi
 
     # Checking the last line in the specified tmux pane for the output: Quit correctly; then killing the tmux session for the server if the statement is successful
-    last_line=$(tmux capture-pane -pS -1 -t servername:0.0 | awk '{line3=line2; line2=line1; line1=$0} END{print line3}')
-    if [ "$last_line" == "Quit correctly" ]; then
+    second_last_line=$(tmux capture-pane -pS -1 -t servername:0.0 | awk '{line2=line1; line1=$0} END{print line2}')
+    third_last_line=$(tmux capture-pane -pS -2 -t servername:0.0 | awk '{line3=line2; line2=line1; line1=$0} END{print line3}')
+    if [ "$second_last_line" == "Quit correctly" ] || [ "$third_last_line" == "Quit correctly" ]; then
         # Sleep for one second before killing the session
         sleep 1
         tmux kill-session -t servername
