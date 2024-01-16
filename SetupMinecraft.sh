@@ -294,8 +294,6 @@ Update_Server() {
 
 Check_Architecture() {
 
-  set -x
-
   # Check CPU archtecture to see if we need to do anything special for the platform the server is running on
   echo "Getting system CPU architecture..."
   CPUArch=$(uname -m)
@@ -382,9 +380,6 @@ Check_Architecture() {
     sudo ln -s $DirName/minecraftbe/$ServerName/ld-2.33.so /lib64/ld-linux-x86-64.so.2
     sudo ln -s $DirName/minecraftbe/$ServerName/ld-2.35.so /lib64/ld-linux-x86-64.so.2
   fi
-
-  sleep 10
-  set +x
 
   # Check for x86 (32 bit) architecture
   if [[ "$CPUArch" == *"i386"* || "$CPUArch" == *"i686"* ]]; then
