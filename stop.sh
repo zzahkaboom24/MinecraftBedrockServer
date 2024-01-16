@@ -8,12 +8,15 @@ PathLength=${#USERPATH}
 if [[ "$PathLength" -gt 12 ]]; then
   PATH="$USERPATH"
 else
-  echo "Unable to set path variable.  You likely need to download an updated version of SetupMinecraft.sh from GitHub!"
+  echo "Unable to set path variable."
+  echo "You likely need to download an updated version of SetupMinecraft.sh from GitHub!"
 fi
 
 # Check to make sure we aren't running as root
 if [[ $(id -u) = 0 ]]; then
-  echo "This script is not meant to be run as root. Please run ./stop.sh as a non-root user, without sudo;  Exiting..."
+  echo "This script is not meant to be run as root."
+  echo "Please run ./stop.sh as a non-root user, without sudo."
+  echo "Exiting..."
   exit 1
 fi
 
@@ -46,7 +49,8 @@ while getopts ":t:" opt; do
     esac
     ;;
   \?)
-    echo "Invalid option: -$OPTARG; countdown time must be a whole number in minutes." >&2
+    echo "Invalid option: -$OPTARG"
+    echo "Countdown time must be a whole number in minutes." >&2
     ;;
   esac
 done
@@ -66,12 +70,15 @@ while [[ $CountdownTime -gt 0 ]]; do
       sleep 10
       CountdownTime=$((CountdownTime - 1))
     elif [ "viewmanager" == "tmux" ]; then
-      tmux send-keys -t servername:0.0 "echo Stopping server in 60 seconds..." C-m
-      tmux send-keys -t servername:0.0 'sleep 30' C-m
-      tmux send-keys -t servername:0.0 "echo Stopping server in 30 seconds..." C-m
-      tmux send-keys -t servername:0.0 'sleep 20' C-m
-      tmux send-keys -t servername:0.0 "echo Stopping server in 10 seconds..." C-m
-      tmux send-keys -t servername:0.0 'sleep 10' C-m
+      tmux send-keys -t servername:0.0 "say Stopping server in 60 seconds..." C-m
+      echo "Stopping server in 60 seconds..."
+      sleep 30
+      tmux send-keys -t servername:0.0 "say Stopping server in 30 seconds..." C-m
+      echo "Stopping server in 30 seconds..."
+      sleep 20
+      tmux send-keys -t servername:0.0 "say Stopping server in 10 seconds..." C-m
+      echo "Stopping server in 10 seconds..."
+      sleep 10
       CountdownTime=$((CountdownTime - 1))
     fi
   else
@@ -81,8 +88,9 @@ while [[ $CountdownTime -gt 0 ]]; do
       sleep 60
       CountdownTime=$((CountdownTime - 1))
     elif [ "viewmanager" == "tmux" ]; then
-      tmux send-keys -t servername:0.0 "echo Stopping server in $CountdownTime minutes..." C-m
-      tmux send-keys -t servername:0.0 'sleep 60' C-m
+      tmux send-keys -t servername:0.0 "say Stopping server in $CountdownTime minutes..." C-m
+      echo "Stopping server in $CountdownTime minutes...$(printf '\r')"
+      sleep 60
       CountdownTime=$((CountdownTime - 1))
     fi
   fi
@@ -94,7 +102,7 @@ if [ "viewmanager" == "screen" ]; then
   screen -Rd servername -X stuff "say Stopping server (stop.sh called)...$(printf '\r')"
   screen -Rd servername -X stuff "stop$(printf '\r')"
 elif [ "viewmanager" == "tmux" ]; then
-  tmux send-keys -t servername:0.0 "echo Stopping server (stop.sh called)..." C-m
+  tmux send-keys -t servername:0.0 "say Stopping server (stop.sh called)..." C-m
   tmux send-keys -t servername:0.0 'stop' C-m
 fi
 
