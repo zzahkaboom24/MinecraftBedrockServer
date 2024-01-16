@@ -12,7 +12,8 @@ PathLength=${#USERPATH}
 if [[ "$PathLength" -gt 12 ]]; then
   PATH="$USERPATH"
 else
-  echo "Unable to set path variable.  You likely need to download an updated version of SetupMinecraft.sh from GitHub!"
+  echo "Unable to set path variable."
+  echo "You likely need to download an updated version of SetupMinecraft.sh from GitHub!"
 fi
 
 echo "Taking ownership of all server files/folders in dirname/minecraftbe/servername..."
