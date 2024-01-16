@@ -131,12 +131,12 @@ fi
 
 if [ "tmux" == "screen" ]; then
   echo "Starting Minecraft server."
-  echo "To view window type screen -r ProjectSurvival"
+  echo "To view window type screen -r servername"
   echo "To minimize the window and let the server run in the background, press Ctrl+A then Ctrl+D"
-  sudo -n systemctl start ProjectSurvival
+  sudo -n systemctl start servername
 elif [ "tmux" == "tmux" ]; then
   echo "Starting Minecraft server."
-  echo "To view window type tmux attach -t ProjectSurvival:0.0"
+  echo "To view window type tmux attach -t servername:0.0"
   echo "To minimize the window and let the server run in the background, press Ctrl+B+D"
-  sudo -n systemctl start ProjectSurvival
+  sudo -n systemctl start servername
 fi
