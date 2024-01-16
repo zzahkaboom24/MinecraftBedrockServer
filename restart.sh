@@ -74,7 +74,7 @@ elif [ "viewmanager" == "tmux" ]; then
   sleep 1s
   tmux send-keys -t servername:0.0 "say Closing server..." C-m
   tmux send-keys -t servername:0.0 'stop' C-m
-if
+fi
 
 echo "Closing server..."
 # Wait up to 30 seconds for server to close
