@@ -566,7 +566,7 @@ if [ "$ViewManager" == "screen" ]; then
     echo "Type screen -r $ServerName to view the running server!"
   fi
 elif [ "$ViewManager" == "tmux" ]; then
-  if ! tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^$ServerName: console"; then
+  if ! tmux list-sessions -F "#{session_name} #{window_name} (created #{session_created})" | awk -F " " '{printf "%s: %s (%s)\n", $1, $2, strftime("%Y-%m-%d %H:%M:%S", $4)}' | sed 's/ (created [0-9]*)//' | tr -s ' ' | grep -q "^$ServerName: console"; then
     echo "Minecraft server failed to start after 20 seconds."
   else
     echo ""
