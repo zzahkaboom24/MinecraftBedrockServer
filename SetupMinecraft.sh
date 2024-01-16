@@ -403,7 +403,8 @@ Update_Sudoers() {
 if [[ $(id -u) = 0 ]]; then
   echo "This script is not meant to be run as root."
   echo "Please run ./SetupMinecraft.sh as a non-root user, without sudo."
-  echo "The script will call sudo when it is needed. Exiting..."
+  echo "The script will call sudo when it is needed."
+  echo "Exiting..."
   exit 1
 fi
 
