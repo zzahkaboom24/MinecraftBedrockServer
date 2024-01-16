@@ -37,13 +37,13 @@ function read_with_prompt {
     raw_input="${raw_input/#\~/$HOME}"
     declare -g "$variable_name=$raw_input"
     if [ -z "$(command -v xargs)" ]; then
-      declare -g "$variable_name"=$(echo "${!variable_name}" | xargs)
+      declare -g "$variable_name"=$( "${!variable_name}" | xargs)
     fi
-    declare -g "$variable_name"=$(echo "${!variable_name}" | head -n1 | awk '{print $1;}' | tr -cd '[a-zA-Z0-9]._/-')
+    declare -g "$variable_name"=$( "${!variable_name}" | head -n1 | awk '{print $1;}' | tr -cd '[a-zA-Z0-9]._/-')
     if [[ -z ${!variable_name} ]] && [[ -n "$default" ]]; then
       declare -g "$variable_name"="$default"
     fi
-    echo -n "$prompt: ${!variable_name} -- accept (y/n)? "
+     -n "$prompt: ${!variable_name} -- accept (y/n)? "
     read answer </dev/tty
     if [[ "$answer" == "${answer#[Yy]}" ]]; then
       unset "$variable_name"
@@ -66,7 +66,8 @@ if [[ "$DirName" != /* ]]; then
 fi
 DirName=$(get_abs_path "$DirName")
 if [ ! -d "$DirName" ]; then
-  echo "Directory does not exist. Falling back to the home directory."
+  echo "Directory does not exist."
+  echo "Falling back to the home directory."
   DirName=~
 fi
 
@@ -75,7 +76,8 @@ export ViewManager
 while true; do
   echo ""
   echo "Do you want to use 'screen' or 'tmux'? (default 'screen'): "
-  echo "Type 'screen' or 'tmux' to choose between one or the other. Leave the input blank to default back to 'screen'"
+  echo "Type 'screen' or 'tmux' to choose between one or the other."
+  echo "Leave the input blank to default back to 'screen'"
   read_with_prompt ViewManager "View Manager" screen
 
   # Installing the chosen Terminal ViewManager
@@ -90,7 +92,8 @@ while true; do
     fi
     break
   else
-    echo "Invalid choice. Please enter 'screen', 'tmux' or hit enter to default back to 'screen'."
+    echo "Invalid choice."
+    echo "Please enter 'screen', 'tmux' or hit enter to default back to 'screen'."
   fi
 done
 
@@ -268,7 +271,8 @@ Check_Dependencies() {
     if ! command -v curl &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install curl -yqq; fi
     echo "Dependency installation completed"
   else
-    echo "Warning: apt was not found. You may need to install curl, screen, tmux, unzip, libcurl4, openssl, libc6 and libcrypt1 with your package manager for the server to start properly!"
+    echo "Warning: apt was not found."
+    echo "You may need to install curl, screen, tmux, unzip, libcurl4, openssl, libc6 and libcrypt1 with your package manager for the server to start properly!"
   fi
 }
 
@@ -312,7 +316,8 @@ Check_Architecture() {
     echo "Installing QEMU..."
     QEMUVer=$(apt-cache show qemu-user-static | grep Version | awk 'NR==1{ print $2 }' | cut -c3-3)
     if [[ "$QEMUVer" -lt "3" ]]; then
-      echo "Available QEMU version is not high enough to emulate x86_64. Please update your QEMU version."
+      echo "Available QEMU version is not high enough to emulate x86_64."
+      echo "Please update your QEMU version."
       exit 1
     else
       sudo DEBIAN_FRONTEND=noninteractive apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install qemu-user-static binfmt-support -yqq
@@ -336,13 +341,16 @@ Check_Architecture() {
     sudo ln -s $DirName/minecraftbe/$ServerName/ld-2.35.so /lib64/ld-linux-x86-64.so.2
   elif [[ "$CPUArch" == *"arm"* ]]; then
     # ARM architecture detected -- download QEMU and dependency libraries
-    echo "WARNING: ARM 32 platform detected -- This is not recommended. 64 bit ARM (aarch64) can use Box64 for emulation.  It is recommended to upgrade to a 64 bit OS."
+    echo "WARNING: ARM 32 platform detected -- This is not recommended."
+    echo "64 bit ARM (aarch64) can use Box64 for emulation."
+    echo "It is recommended to upgrade to a 64 bit OS."
     echo "Installing dependencies..."
 
     # Check if latest available QEMU version is at least 3.0 or higher
     QEMUVer=$(apt-cache show qemu-user-static | grep Version | awk 'NR==1{ print $2 }' | cut -c3-3)
     if [[ "$QEMUVer" -lt "3" ]]; then
-      echo "Available QEMU version is not high enough to emulate x86_64. Please update your QEMU version."
+      echo "Available QEMU version is not high enough to emulate x86_64."
+      echo "Please update your QEMU version."
       exit
     else
       sudo DEBIAN_FRONTEND=noninteractive apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install qemu-user-static binfmt-support -yqq
@@ -369,7 +377,8 @@ Check_Architecture() {
   # Check for x86 (32 bit) architecture
   if [[ "$CPUArch" == *"i386"* || "$CPUArch" == *"i686"* ]]; then
     # 32 bit attempts have not been successful -- notify user to install 64 bit OS
-    echo "You are running a 32 bit operating system (i386 or i686) and the Bedrock Dedicated Server has only been released for 64 bit (x86_64). If you have a 64 bit processor please install a 64 bit operating system to run the Bedrock dedicated server!"
+    echo "You are running a 32 bit operating system (i386 or i686) and the Bedrock Dedicated Server has only been released for 64 bit (x86_64)."
+    echo "If you have a 64 bit processor please install a 64 bit operating system to run the Bedrock dedicated server!"
     exit 1
   fi
 }
