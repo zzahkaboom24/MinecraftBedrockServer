@@ -92,12 +92,6 @@ while true; do
   fi
 done
 
-if [ "$ViewManager" == "screen" ]; then
-  console_command="screen -r $ServerName"
-elif [ "$ViewManager" == "tmux" ]; then
-  console_command="tmux attach -t MinecraftBedrockServer:0"
-fi
-
 Update_Scripts() {
   # Remove existing scripts
   rm -f start.sh stop.sh restart.sh fixpermissions.sh revert.sh
@@ -434,6 +428,12 @@ ServerName=$(echo "$ServerName" | tr -cd '[a-zA-Z0-9]._-')
 if [[ "$ServerName" == *"minecraftbe"* ]]; then
   echo "Server label of minecraftbe is not allowed.  Please choose a different server label!"
   exit 1
+fi
+
+if [ "$ViewManager" == "screen" ]; then
+  console_command="screen -r $ServerName"
+elif [ "$ViewManager" == "tmux" ]; then
+  console_command="tmux attach -t $ServerName -c console"
 fi
 
 echo "Enter server IPV4 port (default 19132): "
