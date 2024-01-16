@@ -92,6 +92,12 @@ while true; do
   fi
 done
 
+if [ "$ViewManager" == "screen" ]; then
+  console_command="screen -r $ServerName"
+elif [ "$ViewManager" == "tmux" ]; then
+  console_command="tmux attach -t MinecraftBedrockServer:0"
+fi
+
 Update_Scripts() {
   # Remove existing scripts
   rm -f start.sh stop.sh restart.sh fixpermissions.sh revert.sh
@@ -459,12 +465,6 @@ if [ -d "$ServerName" ]; then
 
   # Fix server files/folders permissions
   Fix_Permissions
-
-  if [ "$ViewManager" == "screen" ]; then
-    console_command="screen -r $ServerName"
-  elif [ "$ViewManager" == "tmux" ]; then
-    console_command="tmux attach -t MinecraftBedrockServer:0"
-  fi
 
   # Setup completed
   echo "Setup is complete.  Starting Minecraft $ServerName server."
