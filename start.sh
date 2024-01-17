@@ -232,7 +232,7 @@ elif [ "viewmanager" == "tmux" ]; then
       tmux send-keys -t servername:0 'tmux split-window -h' C-m
       tmux send-keys -t servername:0.0 'tmux set -g status-left ""' C-m
       tmux send-keys -t servername:0.0 'clear' C-m
-      tmux send-keys -t servername:0.0 "/bin/bash -c \"${BASH_CMD}\" > >(tee -a $LOG_FILE) 2>&1" C-m
+      tmux send-keys -t servername:0.0 "exec /bin/bash -c \"${BASH_CMD}\" > >(tee -a $LOG_FILE) 2>&1" C-m
   else
       echo "gawk application was not found -- timestamps will not be available in the logs."
       echo "Please delete SetupMinecraft.sh and run the script the new recommended way!"
@@ -245,6 +245,6 @@ elif [ "viewmanager" == "tmux" ]; then
       tmux send-keys -t servername:0 'tmux split-window -h' C-m
       tmux send-keys -t servername:0.0 'tmux set -g status-left ""' C-m
       tmux send-keys -t servername:0.0 'clear' C-m
-      tmux send-keys -t servername:0.0 "/bin/bash -c \"${BASH_CMD}\" > >(tee -a $LOG_FILE) 2>&1" C-m
+      tmux send-keys -t servername:0.0 "exec /bin/bash -c \"${BASH_CMD}\" > >(tee -a $LOG_FILE) 2>&1" C-m
   fi
 fi
