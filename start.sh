@@ -223,7 +223,6 @@ if [ "viewmanager" == "screen" ]; then
 elif [ "viewmanager" == "tmux" ]; then
   if command -v gawk &>/dev/null; then
       export LOG_FILE="logs/servername.$(date +%Y.%m.%d.%H.%M.%S).log"
-      BASH_CMD+=" | tee $LOG_FILE"
       (
         while [ ! -e "$LOG_FILE" ]; do sleep 1; done
       ) &
