@@ -239,18 +239,21 @@ Check_Dependencies() {
       if [[ "$CurlVer" ]]; then sudo DEBIAN_FRONTEND=noninteractive apt-get install libcurl3 -yqq; fi
     fi
 
-    # Install libssl3 dependency as Bedrock server is linking to both
-    CurlVer=$(apt-cache show libssl3 | grep Version | awk 'NR==1{ print $2 }')
-    if [[ "$CurlVer" ]]; then sudo DEBIAN_FRONTEND=noninteractive apt-get install libssl3 -yqq; fi
-
-    sudo DEBIAN_FRONTEND=noninteractive apt-get install libc6 -yqq
-    sudo DEBIAN_FRONTEND=noninteractive apt-get install libcrypt1 -yqq
-
-    # Install libssl 1.1 if available
-    SSLVer=$(apt-cache show libssl1.1 | grep Version | awk 'NR==1{ print $2 }')
-    if [[ "$SSLVer" ]]; then
-      sudo DEBIAN_FRONTEND=noninteractive apt-get install libssl1.1 -yqq
-    else
+    UbuntuVer=$(lsb_release -d | cut -f2- | cut -d' ' -f2 | cut -d'.' -f1,2)
+      if [[ $(echo "$UbuntuVer >= 22.04" | bc -l) -eq 1 ]]; then
+        # Install libssl3 dependency as Bedrock server is linking to both
+        CurlVer=$(apt-cache show libssl3 | grep Version | awk 'NR==1{ print $2 }')
+        if [[ "$CurlVer" ]]; then sudo DEBIAN_FRONTEND=noninteractive apt-get install libssl3 -yqq; fi
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install libc6 -yqq
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install libcrypt1 -yqq
+      else
+        # Install libssl 1.1 if available
+        SSLVer=$(apt-cache show libssl1.1 | grep Version | awk 'NR==1{ print $2 }')
+        if [[ "$SSLVer" ]]; then sudo DEBIAN_FRONTEND=noninteractive apt-get install libssl1.1 -yqq; fi
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install libc6 -yqq
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install libcrypt1 -yqq
+      fi
+    
       CPUArch=$(uname -m)
       if [[ "$CPUArch" == *"x86_64"* ]]; then
         echo "No libssl1.1 available in repositories -- attempting manual install"
