@@ -268,10 +268,9 @@ Check_Dependencies() {
           echo "Manual libssl1.1 installation failed."
         fi
       fi
-    fi
 
-    # Double check curl since libcurl dependency issues can sometimes remove it
-    if ! command -v curl &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install curl -yqq; fi
+  # Double check curl since libcurl dependency issues can sometimes remove it
+  if ! command -v curl &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install curl -yqq; fi
     echo "Dependency installation completed"
   else
     echo "Warning: apt was not found."
