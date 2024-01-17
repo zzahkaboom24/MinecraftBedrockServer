@@ -556,6 +556,6 @@ elif [ "$ViewManager" == "tmux" ]; then
   else
     echo ""
     echo "Minecraft server has started."
-    echo "Type tmux attach -t $ServerName:0.0 console to view the running server!"
+    echo "Type tmux attach -t $ServerName:0.0 to view the running server!"
   fi
 fi
