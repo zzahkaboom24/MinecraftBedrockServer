@@ -120,11 +120,9 @@ while [[ $StopChecks -lt 20 ]]; do
       break
     fi
 
-    # Checking the last line in the specified tmux pane for the output: Quit correctly; then killing the tmux session for the server if the statement is successful
-    second_last_line=$(tmux capture-pane -pS -1 -t servername:0.0 | awk '{line2=line1; line1=$0} END{print line2}')
-    third_last_line=$(tmux capture-pane -pS -2 -t servername:0.0 | awk '{line3=line2; line2=line1; line1=$0} END{print line3}')
-    if [ "$second_last_line" == "Quit correctly" ] || [ "$third_last_line" == "Quit correctly" ]; then
-        # Sleep for one second before killing the session
+    # Checking if the bedrock_server process is still running or not and based on that killing the tmux server
+    if ! pgrep -x "bedrock_server" > /dev/null
+    then
         sleep 1
         tmux kill-session -t servername
         break
