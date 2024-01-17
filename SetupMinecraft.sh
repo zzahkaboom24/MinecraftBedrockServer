@@ -227,7 +227,7 @@ Check_Dependencies() {
     if ! command -v route &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install net-tools -yqq; fi
     if ! command -v gawk &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install gawk -yqq; fi
     if ! command -v openssl &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install openssl -yqq; fi
-    if ! command -v xargs &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install xargs -yqq; fi
+    if ! command -v xargs &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install findutils -yqq; fi
     if ! command -v pigz &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install pigz -yqq; fi
 
     CurlVer=$(apt-cache show libcurl4 | grep Version | awk 'NR==1{ print $2 }')
