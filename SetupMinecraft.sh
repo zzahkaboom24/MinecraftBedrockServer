@@ -313,24 +313,6 @@ Check_Architecture() {
       echo "box64 did not install successfully -- please check the above output to see what went wrong."
     fi
 
-    # Check if latest available QEMU version is at least 3.0 or higher
-    echo "Installing QEMU..."
-    QEMUVer=$(apt-cache show qemu-user-static | grep Version | awk 'NR==1{ print $2 }' | cut -c3-3)
-    if [[ "$QEMUVer" -lt "3" ]]; then
-      echo "Available QEMU version is not high enough to emulate x86_64."
-      echo "Please update your QEMU version."
-      exit 1
-    else
-      sudo DEBIAN_FRONTEND=noninteractive apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install qemu-user-static binfmt-support -yqq
-    fi
-
-    if [ -n "$(which qemu-x86_64-static)" ]; then
-      echo "QEMU-x86_64-static installed successfully"
-    else
-      echo "QEMU-x86_64-static did not install successfully -- please check the above output to see what went wrong."
-      exit 1
-    fi
-
     # Retrieve depends.zip from GitHub repository
     curl -sSL -H "Accept-Encoding: identity" -L -o depends.zip https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/depends.zip
     unzip depends.zip
