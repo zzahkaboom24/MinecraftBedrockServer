@@ -110,7 +110,7 @@ See the following links:<br>
 <ul>
   <li>January 16th 2024</li>
   <ul>
-    <li>Full implementation of the tmux terminal multiplexer with parity to the legacy screen terminal multiplexer</li>
+    <li>Full implementation of the `tmux` terminal multiplexer with parity to the legacy `screen` terminal multiplexer</li>
     <li>Fix ARM64 builds not using box64 due to QEMU removing box64 by removing the QEMU installation and only relying on box64</li>
     <li>Cleaned up the SetupMinecraft.sh script (and other scripts too) to hide the download progress of the curl commands, thus clearing up the script progress and making user prompts more obvious</li>
   </ul>
