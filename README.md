@@ -110,7 +110,7 @@ See the following links:<br>
 <ul>
   <li>January 16th 2024</li>
   <ul>
-    <li>Full implementation of the `tmux` terminal multiplexer with parity to the legacy `screen` terminal multiplexer</li>
+    <li>Full implementation of the <code>tmux</code> terminal multiplexer with parity to the legacy <code>screen</code> terminal multiplexer</li>
     <li>Fix ARM64 builds not using box64 due to QEMU removing box64 by removing the QEMU installation and only relying on box64</li>
     <li>Cleaned up the SetupMinecraft.sh script (and other scripts too) to hide the download progress of the curl commands, thus clearing up the script progress and making user prompts more obvious</li>
   </ul>
@@ -146,9 +146,9 @@ See the following links:<br>
   </ul>
   <li>August 2nd 2022</li>
     <ul>
-      <li>Add Box64 support for 64 bit ARM (aarch64).  32 bit ARM is not recommended as it cannot use Box64 so it will be much slower than if you install a 64-bit version of your OS on the device.</li>
+      <li>Add Box64 support for 64 bit ARM (aarch64). 32 bit ARM is not recommended as it cannot use Box64 so it will be much slower than if you install a 64-bit version of your OS on the device.</li>
       <li>You must be running a 64-bit OS to benefit from the Box64 increased speeds (both Ubuntu and Raspberry Pi OS have 64-bit versions)</li>
-      <li>An easy way to check and make sure you are running 64 bit is to use <pre>uname -m</pre> which will return "aarch64" if you are on 64-bit ARM</li>
+      <li>An easy way to check and make sure you are running 64 bit is to use <code>uname -m</code> which will return "aarch64" if you are on 64-bit ARM</li>
     </ul>
   <li>July 24th 2022</li>
     <ul>
