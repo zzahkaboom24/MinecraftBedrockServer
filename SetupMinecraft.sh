@@ -223,6 +223,7 @@ Check_Dependencies() {
 
     echo "Checking and installing dependencies.."
     if ! command -v curl &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install curl -yqq; fi
+    if ! command -v cmake &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install cmake -yqq; fi
     if ! command -v unzip &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install unzip -yqq; fi
     if ! command -v route &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install net-tools -yqq; fi
     if ! command -v gawk &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install gawk -yqq; fi
@@ -274,7 +275,7 @@ Check_Dependencies() {
     echo "Dependency installation completed"
   else
     echo "Warning: apt was not found."
-    echo "You may need to install curl, screen, tmux, unzip, libcurl4, openssl, libc6 and libcrypt1 with your package manager for the server to start properly!"
+    echo "You may need to install curl, cmake, screen, tmux, unzip, libcurl4, openssl, libc6 and libcrypt1 with your package manager for the server to start properly!"
   fi
 }
 
@@ -302,15 +303,22 @@ Check_Architecture() {
   echo "System Architecture: $CPUArch"
 
   # Check for ARM architecture
-  if [[ "$CPUArch" == *"aarch"* ]]; then
+  if [[ "$CPUArch" == *"aarch"* && -z "$(which box64)" ]]; then
     # ARM architecture detected -- download QEMU and dependency libraries
     echo "aarch64 platform detected -- installing box64..."
-    GetList=$(sudo curl -sSL -k -o /etc/apt/sources.list.d/box64.list https://ryanfortner.github.io/box64-debs/box64.list)
-    GetKey=$(sudo curl -sSL -k https://ryanfortner.github.io/box64-debs/KEY.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/box64-debs-archive-keyring.gpg)
-    sudo DEBIAN_FRONTEND=noninteractive apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install box64-rpi4arm64 -y
+    curl -sSL -H "Accept-Encoding: identity" -L -o v0.2.6.zip https://github.com/ptitSeb/box64/archive/refs/tags/v0.2.6.zip
+    unzip v0.2.6.zip
+    cd box64-0.2.6
+    echo "building box64 from source for generic ARM64 Linux platforms -- version 0.2.6..."
+    sleep 5
+    # Using V0.2.6, because everything after seems to have weird symbol issues for now
+    mkdir build; cd build; cmake .. -D ARM_DYNAREC=ON -D CMAKE_BUILD_TYPE=RelWithDebInfo
+    make -j4
+    sudo make install
+    sudo systemctl restart systemd-binfmt
 
     if [ -n "$(which box64)" ]; then
-      echo "box64 installed successfully"
+      echo "box64 installed successfully or already installed"
     else
       echo "box64 did not install successfully -- please check the above output to see what went wrong."
     fi
