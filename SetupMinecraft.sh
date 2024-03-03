@@ -316,6 +316,8 @@ Check_Architecture() {
     make -j4
     sudo make install
     sudo systemctl restart systemd-binfmt
+    cd ..
+    cd ..
 
     if [ -n "$(which box64)" ]; then
       echo "box64 installed successfully or already installed"
