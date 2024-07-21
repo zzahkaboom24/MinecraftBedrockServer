@@ -308,6 +308,7 @@ Check_Architecture() {
     echo "aarch64 platform detected -- installing box64..."
     curl -sSL -H "Accept-Encoding: identity" -L -o v0.2.6.zip https://github.com/ptitSeb/box64/archive/refs/tags/v0.2.6.zip
     unzip v0.2.6.zip
+    rm v0.2.6.zip
     cd box64-0.2.6
     echo "building box64 from source for generic ARM64 Linux platforms -- version 0.2.6..."
     sleep 5
@@ -318,6 +319,7 @@ Check_Architecture() {
     sudo systemctl restart systemd-binfmt
     cd ..
     cd ..
+    rm -r box64-0.2.6
 
     if [ -n "$(which box64)" ]; then
       echo "box64 installed successfully or already installed"
