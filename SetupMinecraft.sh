@@ -479,7 +479,9 @@ Update_Sudoers() {
 ################################################################################################# End Functions
 
 # Check to make sure we aren't running as root
-if [[ $(id -u) = 0 ]]; then
+in_docker=$(ifconfig eth0 | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')
+is_inDocker=$(echo "$in_docker" | grep -q "172" && echo "yes")
+if [ $(id -u) = 0 ] && [ "$is_inDocker" != "yes" ]; then
   echo "This script is not meant to be run as root."
   echo "Please run ./SetupMinecraft.sh as a non-root user, without sudo."
   echo "The script will call sudo when it is needed."
