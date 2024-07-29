@@ -261,13 +261,13 @@ Check_Dependencies() {
       if ! command -v pigz &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install pigz -yqq; fi
 
       CurlVer=$(apt-cache show libcurl4 | grep Version | awk 'NR==1{ print $2 }')
-      if [[ "$CurlVer" ]]; then
-        sudo DEBIAN_FRONTEND=noninteractive apt-get install libcurl4 -yqq
-      else
-        # Install libcurl3 for backwards compatibility in case libcurl4 isn't available
-        CurlVer=$(apt-cache show libcurl3 | grep Version | awk 'NR==1{ print $2 }')
-        if [[ "$CurlVer" ]]; then sudo DEBIAN_FRONTEND=noninteractive apt-get install libcurl3 -yqq; fi
-      fi
+        if [[ "$CurlVer" ]]; then
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install libcurl4 -yqq
+        else
+          # Install libcurl3 for backwards compatibility in case libcurl4 isn't available
+          CurlVer=$(apt-cache show libcurl3 | grep Version | awk 'NR==1{ print $2 }')
+          if [[ "$CurlVer" ]]; then sudo DEBIAN_FRONTEND=noninteractive apt-get install libcurl3 -yqq; fi
+        fi
 
       UbuntuVer=$(lsb_release -d | cut -f2- | cut -d' ' -f2 | cut -d'.' -f1,2)
         if [[ $(echo "$UbuntuVer >= 22.04" | bc -l) -eq 1 ]]; then
@@ -284,10 +284,9 @@ Check_Dependencies() {
           sudo DEBIAN_FRONTEND=noninteractive apt-get install libcrypt1 -yqq
         fi
     
-        CPUArch=$(uname -m)
+      CPUArch=$(uname -m)
         if [[ "$CPUArch" == *"x86_64"* ]]; then
           echo "No libssl1.1 available in repositories -- attempting manual install"
-
           sudo curl -sSL -o libssl.deb -k -L https://github.com/TheRemote/Legendary-Bedrock-Container/raw/main/libssl1-1.deb
           sudo dpkg -i libssl.deb
           sudo rm libssl.deb
@@ -308,57 +307,57 @@ Check_Dependencies() {
     fi
   elif [ "$is_alpine" = "yes" ]; then
     if command -v apk &>/dev/null; then
-    echo "Updating apk.."
-    apk update && apk upgrade
-  fi
-
-    echo "Checking and installing dependencies.."
-    if ! command -v curl &>/dev/null; then apk add curl; fi
-    if ! command -v cmake &>/dev/null; then apk add cmake; fi
-    if ! command -v make &>/dev/null; then apk add make; fi
-    if ! command -v gcc &>/dev/null; then apk add gcc; fi
-    if ! apk info -a | grep musl-dev &>/dev/null; then apk add musl-dev; fi
-    if ! apk info -a | grep build-base &>/dev/null; then apk add build-base; fi
-    if ! apk info -a | grep linux-headers &>/dev/null; then apk add linux-headers; fi
-    if ! command -v bison &>/dev/null; then apk add bison; fi
-    if ! apk inafo -a | grep fts &>/dev/null; then apk add fts; fi
-    if ! command -v unzip &>/dev/null; then apk add unzip; fi
-    if ! command -v route &>/dev/null; then apk add net-tools; fi
-    if ! command -v gawk &>/dev/null; then apk add gawk; fi
-    if ! command -v openssl &>/dev/null; then apk add openssl; fi
-    if ! command -v xargs &>/dev/null; then apk add findutils; fi
-    if ! command -v pigz &>/dev/null; then apk add pigz; fi
-
-    CurlVer=$(apk info libcurl | grep -e 'libcurl-8' | awk 'NR==1{ print $1 }')
-    if [ "$CurlVer" ]; then
-      apk add curl-dev
-    else
-      # Install libcurl3 for backwards compatibility in case libcurl4 isn't available
-      apk add curl
+      echo "Updating apk.."
+      apk update && apk upgrade
     fi
 
-    AlpineVer=$(lsb_release -d | cut -f2- | cut -d' ' -f3 | cut -d'.' -f1,2 | sed 's/^v//')
-      if [[ $(echo "$AlpineVer >= 3.19" | bc -l) -eq 1 ]]; then
-        # Install libssl3 dependency as Bedrock server is linking to both
-        CurlVer=$(apk info libssl3 | grep description | awk 'NR==1{ print $1 }')
+      echo "Checking and installing dependencies.."
+      if ! command -v curl &>/dev/null; then apk add curl; fi
+      if ! command -v cmake &>/dev/null; then apk add cmake; fi
+      if ! command -v make &>/dev/null; then apk add make; fi
+      if ! command -v gcc &>/dev/null; then apk add gcc; fi
+      if ! apk info -a | grep musl-dev &>/dev/null; then apk add musl-dev; fi
+      if ! apk info -a | grep build-base &>/dev/null; then apk add build-base; fi
+      if ! apk info -a | grep linux-headers &>/dev/null; then apk add linux-headers; fi
+      if ! command -v bison &>/dev/null; then apk add bison; fi
+      if ! apk inafo -a | grep fts &>/dev/null; then apk add fts; fi
+      if ! command -v unzip &>/dev/null; then apk add unzip; fi
+      if ! command -v route &>/dev/null; then apk add net-tools; fi
+      if ! command -v gawk &>/dev/null; then apk add gawk; fi
+      if ! command -v openssl &>/dev/null; then apk add openssl; fi
+      if ! command -v xargs &>/dev/null; then apk add findutils; fi
+      if ! command -v pigz &>/dev/null; then apk add pigz; fi
+
+      CurlVer=$(apk info libcurl | grep -e 'libcurl-8' | awk 'NR==1{ print $1 }')
         if [ "$CurlVer" ]; then
-          apk add libssl3
-          apk add gcompat
+          apk add curl-dev
         else
-          # Install libssl 1.1 if available
-          apk add libssl1.1
-          apk add gcompat
+          # Install libcurl3 for backwards compatibility in case libcurl4 isn't available
+          apk add curl
         fi
-      fi
+
+      AlpineVer=$(lsb_release -d | cut -f2- | cut -d' ' -f3 | cut -d'.' -f1,2 | sed 's/^v//')
+        if [[ $(echo "$AlpineVer >= 3.19" | bc -l) -eq 1 ]]; then
+          # Install libssl3 dependency as Bedrock server is linking to both
+          CurlVer=$(apk info libssl3 | grep description | awk 'NR==1{ print $1 }')
+          if [ "$CurlVer" ]; then
+            apk add libssl3
+            apk add gcompat
+          else
+            # Install libssl 1.1 if available
+            apk add libssl1.1
+            apk add gcompat
+          fi
+        fi
       
-  if ! command -v curl &>/dev/null; then 
-    apk add curl
-    echo "Dependency installation completed"
-  else
-    echo "Warning: apk was not found."
-    echo "You may need to install curl, screen, tmux, unzip, libcurl4, openssl, libc6 and libcrypt1 with your package manager for the server to start properly!"
+    if ! command -v curl &>/dev/null; then 
+      apk add curl
+      echo "Dependency installation completed"
+    else
+      echo "Warning: apk was not found."
+      echo "You may need to install curl, screen, tmux, unzip, libcurl4, openssl, libc6 and libcrypt1 with your package manager for the server to start properly!"
+    fi
   fi
-fi
 }
 
 Update_Server() {
