@@ -385,28 +385,32 @@ Check_Architecture() {
   echo "System Architecture: $CPUArch"
 
   # Check for ARM architecture
-  if [[ "$CPUArch" == *"aarch"* && -z "$(which box64)" ]]; then
-    # ARM architecture detected -- download QEMU and dependency libraries
-    echo "aarch64 platform detected -- installing box64..."
-    curl -sSL -H "Accept-Encoding: identity" -L -o v0.2.6.zip https://github.com/ptitSeb/box64/archive/refs/tags/v0.2.6.zip
-    unzip v0.2.6.zip
-    rm v0.2.6.zip
-    cd box64-0.2.6
-    echo "building box64 from source for generic ARM64 Linux platforms -- version 0.2.6..."
-    sleep 5
-    # Using V0.2.6, because everything after seems to have weird symbol issues for now
-    mkdir build; cd build; cmake .. -D ARM_DYNAREC=ON -D CMAKE_BUILD_TYPE=RelWithDebInfo
-    make -j4
-    sudo make install
-    sudo systemctl restart systemd-binfmt
-    cd ..
-    cd ..
-    rm -r box64-0.2.6
+  in_docker=$(ifconfig eth0 | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')
+  is_inDocker=$(echo "$in_docker" | grep -q "172" && echo "yes")
+  if [ "$is_inDocker" != "yes" ]; then
+    if [[ "$CPUArch" == *"aarch"* && -z "$(which box64)" ]]; then
+      # ARM architecture detected -- download QEMU and dependency libraries
+      echo "aarch64 platform detected -- installing box64..."
+      curl -sSL -H "Accept-Encoding: identity" -L -o v0.2.6.zip https://github.com/ptitSeb/box64/archive/refs/tags/v0.2.6.zip
+      unzip v0.2.6.zip
+      rm v0.2.6.zip
+      cd box64-0.2.6
+      echo "building box64 from source for generic ARM64 Linux platforms -- version 0.2.6..."
+      sleep 5
+      # Using V0.2.6, because everything after seems to have weird symbol issues for now
+      mkdir build; cd build; cmake .. -D ARM_DYNAREC=ON -D CMAKE_BUILD_TYPE=RelWithDebInfo
+      make -j4
+      sudo make install
+      sudo systemctl restart systemd-binfmt
+      cd ..
+      cd ..
+      rm -r box64-0.2.6
 
-    if [ -n "$(which box64)" ]; then
-      echo "box64 installed successfully or already installed"
-    else
-      echo "box64 did not install successfully -- please check the above output to see what went wrong."
+      if [ -n "$(which box64)" ]; then
+        echo "box64 installed successfully or already installed"
+      else
+        echo "box64 did not install successfully -- please check the above output to see what went wrong."
+      fi
     fi
 
     # Retrieve depends.zip from GitHub repository
