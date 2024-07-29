@@ -299,7 +299,8 @@ Check_Dependencies() {
         fi
 
     # Double check curl since libcurl dependency issues can sometimes remove it
-    if ! command -v curl &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install curl -yqq; fi
+    if ! command -v curl &>/dev/null; then 
+      sudo DEBIAN_FRONTEND=noninteractive apt-get install curl -yqq
       echo "Dependency installation completed"
     else
       echo "Warning: apt was not found."
