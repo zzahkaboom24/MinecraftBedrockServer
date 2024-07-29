@@ -349,7 +349,7 @@ Check_Dependencies() {
           fi
         fi
       
-    if ! command -v curl &>/dev/null; then apk add curl; fi
+    if ! command -v curl &>/dev/null; then apk add curl;
       echo "Dependency installation completed"
     else
       echo "Warning: apk was not found."
