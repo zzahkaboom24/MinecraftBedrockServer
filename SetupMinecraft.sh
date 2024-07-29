@@ -193,6 +193,7 @@ Update_Scripts() {
   curl -sSL -H "Accept-Encoding: identity" -L -o update.sh https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/update.sh
   chmod +x update.sh
   sed -i "s<pathvariable<$PATH<g" update.sh
+  }
 }
 
 Update_Service() {
