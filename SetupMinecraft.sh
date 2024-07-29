@@ -320,7 +320,7 @@ Check_Dependencies() {
       if ! apk info -a | grep build-base &>/dev/null; then apk add build-base; fi
       if ! apk info -a | grep linux-headers &>/dev/null; then apk add linux-headers; fi
       if ! command -v bison &>/dev/null; then apk add bison; fi
-      if ! apk inafo -a | grep fts &>/dev/null; then apk add fts; fi
+      if ! apk info -a | grep fts &>/dev/null; then apk add fts; fi
       if ! command -v unzip &>/dev/null; then apk add unzip; fi
       if ! command -v route &>/dev/null; then apk add net-tools; fi
       if ! command -v gawk &>/dev/null; then apk add gawk; fi
