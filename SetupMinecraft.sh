@@ -355,6 +355,7 @@ Check_Dependencies() {
       echo "Warning: apk was not found."
       echo "You may need to install curl, screen, tmux, unzip, libcurl4, openssl, libc6 and libcrypt1 with your package manager for the server to start properly!"
     fi
+  fi
 }
 
 Update_Server() {
