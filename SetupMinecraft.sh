@@ -121,6 +121,7 @@ while true; do
       echo "Invalid choice."
       echo "Please enter 'screen', 'tmux' or hit enter to default back to 'screen'."
     fi
+  fi
   done
 
 Update_Scripts() {
