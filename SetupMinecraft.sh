@@ -13,6 +13,16 @@ echo "Minecraft Bedrock Server installation script by James A. Chambers"
 echo "Latest version always at https://github.com/TheRemote/MinecraftBedrockServer"
 echo "Don't forget to set up port forwarding on your router! The default port is 19132"
 
+os_description=$(lsb_release -d | cut -f2-)
+
+is_ubuntu=$(echo "$os_description" | grep -q "Ubuntu 22.04" && echo "yes")
+is_alpine=$(echo "$os_description" | grep -q "Alpine Linux" && echo "yes")
+
+if [ "$is_ubuntu" != "yes" ] && [ "$is_alpine" != "yes" ]; then
+  echo "Unsupported OS: $os_description"
+  exit 1
+fi
+
 # Randomizer for user agent
 RandNum=$(echo $((1 + $RANDOM % 5000)))
 
@@ -81,21 +91,37 @@ while true; do
   read_with_prompt ViewManager "View Manager" screen
 
   # Installing the chosen Terminal ViewManager
-  if [ "$ViewManager" == "screen" ]; then
-    if ! command -v screen &>/dev/null; then
-      sudo DEBIAN_FRONTEND=noninteractive apt-get install screen -yqq
+  if [ "$is_ubuntu" = "yes" ]; then
+    if [ "$ViewManager" == "screen" ]; then
+      if ! command -v screen &>/dev/null; then
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install screen -yqq
+      fi
+      break
+    elif [ "$ViewManager" == "tmux" ]; then
+      if ! command -v tmux &>/dev/null; then
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install tmux -yqq
+      fi
+      break
+    else
+      echo "Invalid choice."
+      echo "Please enter 'screen', 'tmux' or hit enter to default back to 'screen'."
     fi
-    break
-  elif [ "$ViewManager" == "tmux" ]; then
-    if ! command -v tmux &>/dev/null; then
-      sudo DEBIAN_FRONTEND=noninteractive apt-get install tmux -yqq
+  elif [ "$is_alpine" = "yes" ]; then
+    if [ "$ViewManager" == "screen" ]; then
+      if ! command -v screen &>/dev/null; then
+        apk add screen
+      fi
+      break
+    elif [ "$ViewManager" == "tmux" ]; then
+      if ! command -v tmux &>/dev/null; then
+        apk add tmux
+      fi
+      break
+    else
+      echo "Invalid choice."
+      echo "Please enter 'screen', 'tmux' or hit enter to default back to 'screen'."
     fi
-    break
-  else
-    echo "Invalid choice."
-    echo "Please enter 'screen', 'tmux' or hit enter to default back to 'screen'."
-  fi
-done
+  done
 
 Update_Scripts() {
   # Remove existing scripts
@@ -217,66 +243,117 @@ Fix_Permissions() {
 
 Check_Dependencies() {
   # Install dependencies required to run Minecraft server in the background
-  if command -v apt-get &>/dev/null; then
-    echo "Updating apt.."
-    sudo DEBIAN_FRONTEND=noninteractive apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -yqq
+  if [ "$is_ubuntu" = "yes" ]; then
+    if command -v apt-get &>/dev/null; then
+      echo "Updating apt.."
+      sudo DEBIAN_FRONTEND=noninteractive apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -yqq
 
-    echo "Checking and installing dependencies.."
-    if ! command -v curl &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install curl -yqq; fi
-    if ! command -v cmake &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install cmake -yqq; fi
-    if ! command -v unzip &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install unzip -yqq; fi
-    if ! command -v route &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install net-tools -yqq; fi
-    if ! command -v gawk &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install gawk -yqq; fi
-    if ! command -v openssl &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install openssl -yqq; fi
-    if ! command -v xargs &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install findutils -yqq; fi
-    if ! command -v pigz &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install pigz -yqq; fi
+      echo "Checking and installing dependencies.."
+      if ! command -v curl &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install curl -yqq; fi
+      if ! command -v cmake &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install cmake -yqq; fi
+      if ! command -v unzip &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install unzip -yqq; fi
+      if ! command -v route &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install net-tools -yqq; fi
+      if ! command -v gawk &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install gawk -yqq; fi
+      if ! command -v openssl &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install openssl -yqq; fi
+      if ! command -v xargs &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install findutils -yqq; fi
+      if ! command -v pigz &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install pigz -yqq; fi
 
-    CurlVer=$(apt-cache show libcurl4 | grep Version | awk 'NR==1{ print $2 }')
-    if [[ "$CurlVer" ]]; then
-      sudo DEBIAN_FRONTEND=noninteractive apt-get install libcurl4 -yqq
-    else
-      # Install libcurl3 for backwards compatibility in case libcurl4 isn't available
-      CurlVer=$(apt-cache show libcurl3 | grep Version | awk 'NR==1{ print $2 }')
-      if [[ "$CurlVer" ]]; then sudo DEBIAN_FRONTEND=noninteractive apt-get install libcurl3 -yqq; fi
-    fi
-
-    UbuntuVer=$(lsb_release -d | cut -f2- | cut -d' ' -f2 | cut -d'.' -f1,2)
-      if [[ $(echo "$UbuntuVer >= 22.04" | bc -l) -eq 1 ]]; then
-        # Install libssl3 dependency as Bedrock server is linking to both
-        CurlVer=$(apt-cache show libssl3 | grep Version | awk 'NR==1{ print $2 }')
-        if [[ "$CurlVer" ]]; then sudo DEBIAN_FRONTEND=noninteractive apt-get install libssl3 -yqq; fi
-        sudo DEBIAN_FRONTEND=noninteractive apt-get install libc6 -yqq
-        sudo DEBIAN_FRONTEND=noninteractive apt-get install libcrypt1 -yqq
+      CurlVer=$(apt-cache show libcurl4 | grep Version | awk 'NR==1{ print $2 }')
+      if [[ "$CurlVer" ]]; then
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install libcurl4 -yqq
       else
-        # Install libssl 1.1 if available
-        SSLVer=$(apt-cache show libssl1.1 | grep Version | awk 'NR==1{ print $2 }')
-        if [[ "$SSLVer" ]]; then sudo DEBIAN_FRONTEND=noninteractive apt-get install libssl1.1 -yqq; fi
-        sudo DEBIAN_FRONTEND=noninteractive apt-get install libc6 -yqq
-        sudo DEBIAN_FRONTEND=noninteractive apt-get install libcrypt1 -yqq
+        # Install libcurl3 for backwards compatibility in case libcurl4 isn't available
+        CurlVer=$(apt-cache show libcurl3 | grep Version | awk 'NR==1{ print $2 }')
+        if [[ "$CurlVer" ]]; then sudo DEBIAN_FRONTEND=noninteractive apt-get install libcurl3 -yqq; fi
       fi
-    
-      CPUArch=$(uname -m)
-      if [[ "$CPUArch" == *"x86_64"* ]]; then
-        echo "No libssl1.1 available in repositories -- attempting manual install"
 
-        sudo curl -sSL -o libssl.deb -k -L https://github.com/TheRemote/Legendary-Bedrock-Container/raw/main/libssl1-1.deb
-        sudo dpkg -i libssl.deb
-        sudo rm libssl.deb
-        SSLVer=$(apt-cache show libssl1.1 | grep Version | awk 'NR==1{ print $2 }')
-        if [[ "$SSLVer" ]]; then
-          echo "Manual libssl1.1 installation successful!"
+      UbuntuVer=$(lsb_release -d | cut -f2- | cut -d' ' -f2 | cut -d'.' -f1,2)
+        if [[ $(echo "$UbuntuVer >= 22.04" | bc -l) -eq 1 ]]; then
+          # Install libssl3 dependency as Bedrock server is linking to both
+          CurlVer=$(apt-cache show libssl3 | grep Version | awk 'NR==1{ print $2 }')
+          if [[ "$CurlVer" ]]; then sudo DEBIAN_FRONTEND=noninteractive apt-get install libssl3 -yqq; fi
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install libc6 -yqq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install libcrypt1 -yqq
         else
-          echo "Manual libssl1.1 installation failed."
+          # Install libssl 1.1 if available
+          SSLVer=$(apt-cache show libssl1.1 | grep Version | awk 'NR==1{ print $2 }')
+          if [[ "$SSLVer" ]]; then sudo DEBIAN_FRONTEND=noninteractive apt-get install libssl1.1 -yqq; fi
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install libc6 -yqq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install libcrypt1 -yqq
         fi
+    
+        CPUArch=$(uname -m)
+        if [[ "$CPUArch" == *"x86_64"* ]]; then
+          echo "No libssl1.1 available in repositories -- attempting manual install"
+
+          sudo curl -sSL -o libssl.deb -k -L https://github.com/TheRemote/Legendary-Bedrock-Container/raw/main/libssl1-1.deb
+          sudo dpkg -i libssl.deb
+          sudo rm libssl.deb
+          SSLVer=$(apt-cache show libssl1.1 | grep Version | awk 'NR==1{ print $2 }')
+          if [[ "$SSLVer" ]]; then
+            echo "Manual libssl1.1 installation successful!"
+          else
+            echo "Manual libssl1.1 installation failed."
+          fi
+        fi
+
+    # Double check curl since libcurl dependency issues can sometimes remove it
+    if ! command -v curl &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install curl -yqq; fi
+      echo "Dependency installation completed"
+    else
+      echo "Warning: apt was not found."
+      echo "You may need to install curl, cmake, screen, tmux, unzip, libcurl4, openssl, libc6 and libcrypt1 with your package manager for the server to start properly!"
+    fi
+  elif [ "$is_alpine" = "yes" ]; then
+    if command -v apk &>/dev/null; then
+      echo "Updating apk.."
+      apk update && apk upgrade
+
+      echo "Checking and installing dependencies.."
+      if ! command -v curl &>/dev/null; then apk add curl; fi
+      if ! command -v cmake &>/dev/null; then apk add cmake; fi
+      if ! command -v make &>/dev/null; then apk add make; fi
+      if ! command -v gcc &>/dev/null; then apk add gcc; fi
+      if ! apk info -a | grep musl-dev &>/dev/null; then apk add musl-dev; fi
+      if ! apk info -a | grep build-base &>/dev/null; then apk add build-base; fi
+      if ! apk info -a | grep linux-headers &>/dev/null; then apk add linux-headers; fi
+      if ! command -v bison &>/dev/null; then apk add bison; fi
+      if ! apk inafo -a | grep fts &>/dev/null; then apk add fts; fi
+      if ! command -v unzip &>/dev/null; then apk add unzip; fi
+      if ! command -v route &>/dev/null; then apk add net-tools; fi
+      if ! command -v gawk &>/dev/null; then apk add gawk; fi
+      if ! command -v openssl &>/dev/null; then apk add openssl; fi
+      if ! command -v xargs &>/dev/null; then apk add findutils; fi
+      if ! command -v pigz &>/dev/null; then apk add pigz; fi
+
+      CurlVer=$(apk info libcurl | grep -e 'libcurl-8' | awk 'NR==1{ print $1 }')
+      if [ "$CurlVer" ]; then
+        apk add curl-dev
+      else
+        # Install libcurl3 for backwards compatibility in case libcurl4 isn't available
+        apk add curl
       fi
 
-  # Double check curl since libcurl dependency issues can sometimes remove it
-  if ! command -v curl &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install curl -yqq; fi
-    echo "Dependency installation completed"
-  else
-    echo "Warning: apt was not found."
-    echo "You may need to install curl, cmake, screen, tmux, unzip, libcurl4, openssl, libc6 and libcrypt1 with your package manager for the server to start properly!"
-  fi
+      AlpineVer=$(lsb_release -d | cut -f2- | cut -d' ' -f3 | cut -d'.' -f1,2 | sed 's/^v//')
+        if [[ $(echo "$AlpineVer >= 3.19" | bc -l) -eq 1 ]]; then
+          # Install libssl3 dependency as Bedrock server is linking to both
+          CurlVer=$(apk info libssl3 | grep description | awk 'NR==1{ print $1 }')
+          if [ "$CurlVer" ]; then
+            apk add libssl3
+            apk add gcompat
+          else
+            # Install libssl 1.1 if available
+            apk add libssl1.1
+            apk add gcompat
+          fi
+        fi
+      
+    if ! command -v curl &>/dev/null; then apk add curl; fi
+      echo "Dependency installation completed"
+    else
+      echo "Warning: apk was not found."
+      echo "You may need to install curl, screen, tmux, unzip, libcurl4, openssl, libc6 and libcrypt1 with your package manager for the server to start properly!"
+    fi
 }
 
 Update_Server() {
