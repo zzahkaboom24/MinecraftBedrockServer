@@ -32,7 +32,9 @@ fi
 
 if [ "$is_docker" == "yes" ]; then
   mkdir -p /debiandirname/minecraftbe/servername
-  mount --bind dirname/minecraftbe/servername /debiandirname/minecraftbe/servername
+  if ! cat /proc/mounts | grep dirname/minecraftbe/servername &> /dev/null; then
+    mount --bind dirname/minecraftbe/servername /debiandirname/minecraftbe/servername
+  fi
 fi
 
 if [ "$is_docker" != "yes" ]; then
@@ -243,7 +245,7 @@ if [[ "$CPUArch" == *"aarch64"* ]]; then
           BASH_CMD="LD_LIBRARY_PATH=dirname/minecraftbe/servername dirname/minecraftbe/servername/bedrock_server"
       fi
     elif [ "$is_docker" == "yes" ]; then
-      if chroot /debian /bin/bash -c "command -v box64" &> /dev/null; then
+      if chroot /debian /bin/bash -c "command -v box64" &>/dev/null; then
         BASH_CMD='chroot /debian /bin/sh -c "cd dirname/minecraftbe/servername && env BOX64_PATH=dirname/minecraftbe/servername /usr/local/bin/box64 bedrock_server"'
       else
         BASH_CMD="LD_LIBRARY_PATH=dirname/minecraftbe/servername dirname/minecraftbe/servername/bedrock_server"
