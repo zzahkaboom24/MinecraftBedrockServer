@@ -84,7 +84,7 @@ echo ""
 echo "Enter directory path to install Minecraft BE Server to (default ~): "
 read_with_prompt DirName "Directory Path" ~
 # If DirName is not an absolute path, prepend the home directory
-if [[ "$DirName" != /* ]]; then
+if [ "${DirName#/}" = "$DirName" ]; then
     DirName=~/"$DirName"
 fi
 DirName=$(get_abs_path "$DirName")
