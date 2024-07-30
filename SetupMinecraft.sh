@@ -63,6 +63,19 @@ function read_with_prompt {
   done
 }
 
+is_docker=""
+
+echo ""
+echo "Are you running this script inside a Docker container? (default 'no'): "
+echo "Type 'yes' or 'no' to make sure everything runs correctly."
+echo "Leave the input blank to default to 'no'"
+read_with_prompt IsDocker "Is Docker" docker
+if [ "$IsDocker" == "yes" ]; then
+  is_docker="yes"
+else
+  is_docker="no"
+fi
+
 # You can override this for a custom installation directory but I only recommend it if you are using a separate drive for the server
 # It is meant to point to the root folder that holds all servers
 # For example if you had a separate drive mounted at /newdrive you would use DirName='/newdrive' for all servers
@@ -385,9 +398,7 @@ Check_Architecture() {
   echo "System Architecture: $CPUArch"
 
   # Check for ARM architecture
-  in_docker=$(ifconfig eth0 | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')
-  is_inDocker=$(echo "$in_docker" | grep -q "172" && echo "yes")
-  if [ "$is_inDocker" != "yes" ]; then
+  if [ "$is_docker" != "yes" ]; then
     if [[ "$CPUArch" == *"aarch"* && -z "$(which box64)" ]]; then
       # ARM architecture detected -- download QEMU and dependency libraries
       echo "aarch64 platform detected -- installing box64..."
@@ -411,86 +422,139 @@ Check_Architecture() {
       else
         echo "box64 did not install successfully -- please check the above output to see what went wrong."
       fi
+
+      # Retrieve depends.zip from GitHub repository
+      curl -sSL -H "Accept-Encoding: identity" -L -o depends.zip https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/depends.zip
+      unzip depends.zip
+      sudo mkdir /lib64
+      # Create soft link ld-linux-x86-64.so.2 mapped to ld-2.31.so, ld-2.33.so, ld-2,35.so
+      sudo rm -rf /lib64/ld-linux-x86-64.so.2
+      sudo ln -s $DirName/minecraftbe/$ServerName/ld-2.31.so /lib64/ld-linux-x86-64.so.2
+      sudo ln -s $DirName/minecraftbe/$ServerName/ld-2.33.so /lib64/ld-linux-x86-64.so.2
+      sudo ln -s $DirName/minecraftbe/$ServerName/ld-2.35.so /lib64/ld-linux-x86-64.so.2
+    elif [[ "$CPUArch" == *"arm"* ]]; then
+      # ARM architecture detected -- download QEMU and dependency libraries
+      echo "WARNING: ARM 32 platform detected -- This is not recommended."
+      echo "64 bit ARM (aarch64) can use Box64 for emulation."
+      echo "It is recommended to upgrade to a 64 bit OS."
+      echo "Installing dependencies..."
+
+      # Check if latest available QEMU version is at least 3.0 or higher
+      QEMUVer=$(apt-cache show qemu-user-static | grep Version | awk 'NR==1{ print $2 }' | cut -c3-3)
+      if [[ "$QEMUVer" -lt "3" ]]; then
+        echo "Available QEMU version is not high enough to emulate x86_64."
+        echo "Please update your QEMU version."
+        exit
+      else
+        sudo DEBIAN_FRONTEND=noninteractive apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install qemu-user-static binfmt-support -yqq
+      fi
+
+      if [ -n "$(which qemu-x86_64-static)" ]; then
+        echo "QEMU-x86_64-static installed successfully"
+      else
+        echo "QEMU-x86_64-static did not install successfully -- please check the above output to see what went wrong."
+        exit 1
+      fi
+
+      # Retrieve depends.zip from GitHub repository
+      curl -sSL -H "Accept-Encoding: identity" -L -o depends.zip https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/depends.zip
+      unzip depends.zip
+      sudo mkdir /lib64
+      # Create soft link ld-linux-x86-64.so.2 mapped to ld-2.31.so, ld-2.33.so, ld-2,35.so
+      sudo rm -rf /lib64/ld-linux-x86-64.so.2
+      sudo ln -s $DirName/minecraftbe/$ServerName/ld-2.31.so /lib64/ld-linux-x86-64.so.2
+      sudo ln -s $DirName/minecraftbe/$ServerName/ld-2.33.so /lib64/ld-linux-x86-64.so.2
+      sudo ln -s $DirName/minecraftbe/$ServerName/ld-2.35.so /lib64/ld-linux-x86-64.so.2
     fi
 
-    # Retrieve depends.zip from GitHub repository
-    curl -sSL -H "Accept-Encoding: identity" -L -o depends.zip https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/depends.zip
-    unzip depends.zip
-    sudo mkdir /lib64
-    # Create soft link ld-linux-x86-64.so.2 mapped to ld-2.31.so, ld-2.33.so, ld-2,35.so
-    sudo rm -rf /lib64/ld-linux-x86-64.so.2
-    sudo ln -s $DirName/minecraftbe/$ServerName/ld-2.31.so /lib64/ld-linux-x86-64.so.2
-    sudo ln -s $DirName/minecraftbe/$ServerName/ld-2.33.so /lib64/ld-linux-x86-64.so.2
-    sudo ln -s $DirName/minecraftbe/$ServerName/ld-2.35.so /lib64/ld-linux-x86-64.so.2
-  elif [[ "$CPUArch" == *"arm"* ]]; then
-    # ARM architecture detected -- download QEMU and dependency libraries
-    echo "WARNING: ARM 32 platform detected -- This is not recommended."
-    echo "64 bit ARM (aarch64) can use Box64 for emulation."
-    echo "It is recommended to upgrade to a 64 bit OS."
-    echo "Installing dependencies..."
-
-    # Check if latest available QEMU version is at least 3.0 or higher
-    QEMUVer=$(apt-cache show qemu-user-static | grep Version | awk 'NR==1{ print $2 }' | cut -c3-3)
-    if [[ "$QEMUVer" -lt "3" ]]; then
-      echo "Available QEMU version is not high enough to emulate x86_64."
-      echo "Please update your QEMU version."
-      exit
-    else
-      sudo DEBIAN_FRONTEND=noninteractive apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install qemu-user-static binfmt-support -yqq
-    fi
-
-    if [ -n "$(which qemu-x86_64-static)" ]; then
-      echo "QEMU-x86_64-static installed successfully"
-    else
-      echo "QEMU-x86_64-static did not install successfully -- please check the above output to see what went wrong."
+    # Check for x86 (32 bit) architecture
+    if [[ "$CPUArch" == *"i386"* || "$CPUArch" == *"i686"* ]]; then
+      # 32 bit attempts have not been successful -- notify user to install 64 bit OS
+      echo "You are running a 32 bit operating system (i386 or i686) and the Bedrock Dedicated Server has only been released for 64 bit (x86_64)."
+      echo "If you have a 64 bit processor please install a 64 bit operating system to run the Bedrock dedicated server!"
       exit 1
     fi
+  elif [ "$is_docker" == "yes" ]; then
+    if [[ "$CPUArch" == *"aarch"* ]]; then
+      if ! command -v debootstrap &>/dev/null; then apk add debootstrap; fi
+      if [ -d "/debian" ] && [ -f "/debian/etc/debian_version" ]; then
+        echo "Debian is installed in the chroot environment."
+      else
+        debootstrap stable /debian http://deb.debian.org/debian/
+        chroot /debian /bin/bash -c "apt install -y git cmake python3 curl unzip"
+        # ARM architecture detected -- download QEMU and dependency libraries
+        echo "aarch64 platform detected -- installing box64..."
+        chroot /debian /bin/bash -c "curl -sSL -H \"Accept-Encoding: identity\" -L -o v0.2.6.zip https://github.com/ptitSeb/box64/archive/refs/tags/v0.2.6.zip"
+        chroot /debian /bin/bash -c "unzip v0.2.6.zip"
+        chroot /debian /bin/bash -c "rm v0.2.6.zip"
+        echo "building box64 from source for generic ARM64 Linux platforms -- version 0.2.6..."
+        sleep 5
+        chroot /debian /bin/bash -c "cd box64-0.2.6; mkdir build; cd build; cmake .. -D ARM_DYNAREC=ON -D CMAKE_BUILD_TYPE=RelWithDebInfo"
+        chroot /debian /bin/bash -c "cd box64-0.2.6; cd build; make -j4"
+        chroot /debian /bin/bash -c "cd box64-0.2.6; cd build; make install"
+        chroot /debian /bin/bash -c "rm -r box64-0.2.6"
+        chroot /debian /bin/bash -c "which box64"
 
-    # Retrieve depends.zip from GitHub repository
-    curl -sSL -H "Accept-Encoding: identity" -L -o depends.zip https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/depends.zip
-    unzip depends.zip
-    sudo mkdir /lib64
-    # Create soft link ld-linux-x86-64.so.2 mapped to ld-2.31.so, ld-2.33.so, ld-2,35.so
-    sudo rm -rf /lib64/ld-linux-x86-64.so.2
-    sudo ln -s $DirName/minecraftbe/$ServerName/ld-2.31.so /lib64/ld-linux-x86-64.so.2
-    sudo ln -s $DirName/minecraftbe/$ServerName/ld-2.33.so /lib64/ld-linux-x86-64.so.2
-    sudo ln -s $DirName/minecraftbe/$ServerName/ld-2.35.so /lib64/ld-linux-x86-64.so.2
-  fi
+        if [ -n "$(chroot /debian /bin/bash -c "which box64")" ]; then
+          echo "box64 installed successfully or already installed"
+        else
+          echo "box64 did not install successfully -- please check the above output to see what went wrong."
+        fi
 
-  # Check for x86 (32 bit) architecture
-  if [[ "$CPUArch" == *"i386"* || "$CPUArch" == *"i686"* ]]; then
-    # 32 bit attempts have not been successful -- notify user to install 64 bit OS
-    echo "You are running a 32 bit operating system (i386 or i686) and the Bedrock Dedicated Server has only been released for 64 bit (x86_64)."
-    echo "If you have a 64 bit processor please install a 64 bit operating system to run the Bedrock dedicated server!"
-    exit 1
+        # Retrieve depends.zip from GitHub repository
+        curl -sSL -H "Accept-Encoding: identity" -L -o depends.zip https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/depends.zip
+        unzip depends.zip
+        mkdir /lib64
+        # Create soft link ld-linux-x86-64.so.2 mapped to ld-2.31.so, ld-2.33.so, ld-2,35.so
+        rm -rf /lib64/ld-linux-x86-64.so.2
+        ln -s $DirName/minecraftbe/$ServerName/ld-2.31.so /lib64/ld-linux-x86-64.so.2
+        ln -s $DirName/minecraftbe/$ServerName/ld-2.33.so /lib64/ld-linux-x86-64.so.2
+        ln -s $DirName/minecraftbe/$ServerName/ld-2.35.so /lib64/ld-linux-x86-64.so.2
+      fi
+    fi
   fi
 }
 
 Update_Sudoers() {
-  if [ -d /etc/sudoers.d ]; then
-    sudoline="$UserName ALL=(ALL) NOPASSWD: /bin/bash $DirName/minecraftbe/$ServerName/fixpermissions.sh -a, /bin/systemctl start $ServerName, /bin/bash $DirName/minecraftbe/$ServerName/start.sh"
-    if [ -e /etc/sudoers.d/minecraftbe ]; then
-      AddLine=$(sudo grep -qxF "$sudoline" /etc/sudoers.d/minecraftbe || echo "$sudoline" | sudo tee -a /etc/sudoers.d/minecraftbe)
+  if [ "$is_docker" != "yes" ]; then
+    if [ -d /etc/sudoers.d ]; then
+      sudoline="$UserName ALL=(ALL) NOPASSWD: /bin/bash $DirName/minecraftbe/$ServerName/fixpermissions.sh -a, /bin/systemctl start $ServerName, /bin/bash $DirName/minecraftbe/$ServerName/start.sh"
+      if [ -e /etc/sudoers.d/minecraftbe ]; then
+        AddLine=$(sudo grep -qxF "$sudoline" /etc/sudoers.d/minecraftbe || echo "$sudoline" | sudo tee -a /etc/sudoers.d/minecraftbe)
+      else
+        AddLine=$(echo "$sudoline" | sudo tee /etc/sudoers.d/minecraftbe)
+      fi
     else
-      AddLine=$(echo "$sudoline" | sudo tee /etc/sudoers.d/minecraftbe)
+      echo "/etc/sudoers.d was not found on your system."
+      echo "Please add this line to sudoers using sudo visudo: $sudoline"
     fi
-  else
-    echo "/etc/sudoers.d was not found on your system."
-    echo "Please add this line to sudoers using sudo visudo: $sudoline"
+  elif [ "$is_docker" == "yes" ]; then
+    if [ -d /etc/sudoers.d ]; then
+      sudoline="$UserName ALL=(ALL) NOPASSWD: /bin/bash $DirName/minecraftbe/$ServerName/fixpermissions.sh -a, /bin/bash $DirName/minecraftbe/$ServerName/start.sh"
+      if [ -e /etc/sudoers.d/minecraftbe ]; then
+        AddLine=$(grep -qxF "$sudoline" /etc/sudoers.d/minecraftbe || echo "$sudoline" | tee -a /etc/sudoers.d/minecraftbe)
+      else
+        AddLine=$(echo "$sudoline" | tee /etc/sudoers.d/minecraftbe)
+      fi
+    else
+      mkdir -p /etc/sudoers.d
+      sudoline="$UserName ALL=(ALL) NOPASSWD: /bin/bash $DirName/minecraftbe/$ServerName/fixpermissions.sh -a, /bin/bash $DirName/minecraftbe/$ServerName/start.sh"
+      AddLine=$(grep -qxF "$sudoline" /etc/sudoers.d/minecraftbe || echo "$sudoline" | tee -a /etc/sudoers.d/minecraftbe)
+    fi
   fi
 }
 
 ################################################################################################# End Functions
 
 # Check to make sure we aren't running as root
-in_docker=$(ifconfig eth0 | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')
-is_inDocker=$(echo "$in_docker" | grep -q "172" && echo "yes")
-if [ $(id -u) = 0 ] && [ "$is_inDocker" != "yes" ]; then
-  echo "This script is not meant to be run as root."
-  echo "Please run ./SetupMinecraft.sh as a non-root user, without sudo."
-  echo "The script will call sudo when it is needed."
-  echo "Exiting..."
-  exit 1
+if [ "$is_docker" != "yes" ]; then
+  if [[ $(id -u) = 0 ]]; then
+    echo "This script is not meant to be run as root."
+    echo "Please run ./SetupMinecraft.sh as a non-root user, without sudo."
+    echo "The script will call sudo when it is needed."
+    echo "Exiting..."
+    exit 1
+  fi
 fi
 
 if [ -e "SetupMinecraft.sh" ]; then
@@ -581,8 +645,12 @@ if [ -d "$ServerName" ]; then
   echo "To view the console either use the following command:"
   echo "$console_command"
   echo "or check the logs folder if the server fails to start"
-  sudo systemctl daemon-reload
-  sudo systemctl start "$ServerName.service"
+  if [ "$is_docker" != "yes" ]; then
+    sudo systemctl daemon-reload
+    sudo systemctl start "$ServerName.service"
+  elif [ "$is_docker" == "yes" ]; then
+    $DirName/minecraftbe/$ServerName/start.sh
+  fi
 
   exit 0
 fi
@@ -620,8 +688,12 @@ echo "Starting Minecraft $ServerName server."
 echo "To view the console either use the following command:"
 echo "$console_command"
 echo "or check the logs folder if the server fails to start."
-sudo systemctl daemon-reload
-sudo systemctl start "$ServerName.service"
+if [ "$is_docker" != "yes" ]; then
+  sudo systemctl daemon-reload
+  sudo systemctl start "$ServerName.service"
+elif [ "$is_docker" == "yes" ]; then
+  $DirName/minecraftbe/$ServerName/start.sh
+fi
 
 # Wait up to 30 seconds for server to start
 StartChecks=0
