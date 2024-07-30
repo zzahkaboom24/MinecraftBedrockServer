@@ -102,11 +102,20 @@ if [ -d "worlds" ]; then
 fi
 
 # Rotate backups -- keep most recent 10
-Rotate=$(
-    pushd dirname/minecraftbe/servername/backups
-    ls -1tr | head -n -10 | xargs -d '\n' rm -f --
-    popd
-)
+if [ "$is_docker" != "yes" ]; then
+  Rotate=$(
+      pushd dirname/minecraftbe/servername/backups
+      ls -1tr | head -n -10 | xargs -d '\n' rm -f --
+      popd
+  )
+elif [ "$is_docker" == "yes" ]; then
+  if ! apk info -a | grep findutils &>/dev/null; then apk add findutils; fi
+  Rotate=$(
+      pushd dirname/minecraftbe/servername/backups
+      ls -1tr | head -n -10 | xargs -d '\n' rm -f --
+      popd
+  )
+fi
 
 # Retrieve latest version of Minecraft Bedrock dedicated server
 echo "Checking for the latest version of Minecraft Bedrock server ..."
@@ -212,10 +221,18 @@ fi
 CPUArch=$(uname -m)
 if [[ "$CPUArch" == *"aarch64"* ]]; then
     cd dirname/minecraftbe/servername || exit
-    if [ -n "$(which box64)" ]; then
-        BASH_CMD="box64 bedrock_server"
-    else
+    if [ "$is_docker" != "yes" ]; then
+      if [ -n "$(which box64)" ]; then
+          BASH_CMD="box64 bedrock_server"
+      else
+          BASH_CMD="LD_LIBRARY_PATH=dirname/minecraftbe/servername dirname/minecraftbe/servername/bedrock_server"
+      fi
+    elif [ "$is_docker" == "yes" ]; then
+      if chroot /debian /bin/bash -c "command -v box64" &> /dev/null; then
+        BASH_CMD='chroot /debian /bin/sh -c "cd dirname/minecraftbe/servername && env BOX64_PATH=dirname/minecraftbe/servername /usr/local/bin/box64 bedrock_server"'
+      else
         BASH_CMD="LD_LIBRARY_PATH=dirname/minecraftbe/servername dirname/minecraftbe/servername/bedrock_server"
+      fi
     fi
 else
     BASH_CMD="LD_LIBRARY_PATH=dirname/minecraftbe/servername dirname/minecraftbe/servername/bedrock_server"
@@ -241,7 +258,7 @@ elif [ "viewmanager" == "tmux" ]; then
       tmux send-keys -t servername:0 'tmux split-window -h' C-m
       tmux send-keys -t servername:0.0 'tmux set -g status-left ""' C-m
       tmux send-keys -t servername:0.0 'clear' C-m
-      tmux send-keys -t servername:0.0 "exec /bin/bash -c \"${BASH_CMD}\" > >(tee -a $LOG_FILE) 2>&1" C-m
+      tmux send-keys -t servername:0.0 "exec /bin/bash -c '${BASH_CMD}' > >(tee -a $LOG_FILE) 2>&1" C-m
   else
       echo "gawk application was not found -- timestamps will not be available in the logs."
       echo "Please delete SetupMinecraft.sh and run the script the new recommended way!"
@@ -254,6 +271,6 @@ elif [ "viewmanager" == "tmux" ]; then
       tmux send-keys -t servername:0 'tmux split-window -h' C-m
       tmux send-keys -t servername:0.0 'tmux set -g status-left ""' C-m
       tmux send-keys -t servername:0.0 'clear' C-m
-      tmux send-keys -t servername:0.0 "exec /bin/bash -c \"${BASH_CMD}\" > >(tee -a $LOG_FILE) 2>&1" C-m
+      tmux send-keys -t servername:0.0 "exec /bin/bash -c '${BASH_CMD}' > >(tee -a $LOG_FILE) 2>&1" C-m
   fi
 fi
