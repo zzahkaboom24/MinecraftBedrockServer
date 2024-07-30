@@ -450,10 +450,10 @@ Check_Dependencies() {
           fi
 
       # Double check curl since libcurl dependency issues can sometimes remove it
-      if ! command -v curl &>/dev/null; then 
-        sudo apk add curl
+      if command -v curl &>/dev/null; then
         echo "Dependency installation completed"
-      elif command -v curl &>/dev/null; then
+      elif ! command -v curl &>/dev/null; then
+        sudo apk add curl
         echo "Dependency installation completed"
       else
         echo "Warning: apk was not found."
