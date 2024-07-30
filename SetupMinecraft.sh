@@ -579,13 +579,12 @@ Update_Server() {
   unzip -o "downloads/$DownloadFile"
 }
 
-Check_Architecture() {
-
+Check_Architecture() 
+{
   # Check CPU archtecture to see if we need to do anything special for the platform the server is running on
   echo "Getting system CPU architecture..."
   CPUArch=$(uname -m)
   echo "System Architecture: $CPUArch"
-
   # Check for ARM architecture
   if [ "$is_docker" != "yes" ]; then
     if [[ "$CPUArch" == *"aarch"* && -z "$(which box64)" ]]; then
@@ -706,7 +705,8 @@ Check_Architecture() {
           elif [ -n "$(chroot /debian /bin/bash -c "which box64")" ]; then
             echo "box64 installed successfully or already installed"
           fi
-
+        fi
+        
       if [ -n "$(chroot /debian /bin/bash -c "which box64")" ]; then
         echo "box64 installed successfully or already installed"
       else
