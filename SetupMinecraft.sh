@@ -329,12 +329,12 @@ Update_Service() {
       CurrentTime=$(date)
       echo "Your time zone is currently set to $TimeZone."
       echo "Current system time: $CurrentTime"
-      echo "You can adjust/remove the selected reboot time later by typing crontab -e or running SetupMinecraft.sh again."
+      echo "You can adjust/remove the selected reboot time later by typing 'crontab -e' or running SetupMinecraft.sh again."
       echo ""
       echo -n "Automatically restart and backup server at 4am daily (y/n)? "
       read answer </dev/tty
       if [[ "$answer" != "${answer#[Yy]}" ]]; then
-        echo "Run `sudo crontab -e` on your host machine"
+        echo "Run 'sudo crontab -e' on your host machine"
         echo "and paste the following command at the end of the file:"
         echo "0 4 * * * docker exec -it Pterodactyl $DirName/minecraftbe/$ServerName/restart.sh 2>&1"
       fi
@@ -342,7 +342,7 @@ Update_Service() {
       echo -n "Automatically restart and backup server at 4am daily (y/n)? "
       read answer </dev/tty
       if [[ "$answer" != "${answer#[Yy]}" ]]; then
-        echo "Run `sudo crontab -e` on your host machine"
+        echo "Run 'sudo crontab -e' on your host machine"
         echo "and paste the following command at the end of the file:"
         echo "0 4 * * * docker exec -it Pterodactyl $DirName/minecraftbe/$ServerName/restart.sh 2>&1"
       fi
