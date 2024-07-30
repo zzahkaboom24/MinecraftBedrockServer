@@ -265,6 +265,7 @@ Update_Service() {
     # Update minecraft server service
     UserName=$(whoami)
     echo "Configuring Minecraft $ServerName service..."
+    echo "" >> /etc/supervisord.conf
     echo "[program:$ServerName]" >> /etc/supervisord.conf
     echo "command=/bin/sh $DirName/minecraftbe/$ServerName/start.sh" >> /etc/supervisord.conf
     echo "autostart=false" >> /etc/supervisord.conf
