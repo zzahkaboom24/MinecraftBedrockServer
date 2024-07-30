@@ -9,8 +9,6 @@
 #
 # GitHub Repository: https://github.com/TheRemote/MinecraftBedrockServer
 
-set -x
-
 echo "Minecraft Bedrock Server installation script by James A. Chambers"
 echo "Latest version always at https://github.com/TheRemote/MinecraftBedrockServer"
 echo "Don't forget to set up port forwarding on your router! The default port is 19132"
@@ -365,7 +363,7 @@ Check_Dependencies() {
   # Install dependencies required to run Minecraft server in the background
   if [ "$is_docker" != "yes" ]; then
     if [ "$is_ubuntu" = "yes" ]; then
-      if command -v apt-get &>/dev/null; then
+      if ! command -v apt-get &>/dev/null; then
         echo "Updating apt.."
         sudo DEBIAN_FRONTEND=noninteractive apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -yqq
       fi
@@ -427,7 +425,7 @@ Check_Dependencies() {
         echo "You may need to install curl, cmake, screen, tmux, unzip, libcurl4, openssl, libc6 and libcrypt1 with your package manager for the server to start properly!"
       fi
     elif [ "$is_alpine" = "yes" ]; then
-      if command -v apk &>/dev/null; then
+      if ! command -v apk &>/dev/null; then
         echo "Updating apk.."
         sudo apk update && sudo apk upgrade
       fi
@@ -468,7 +466,7 @@ Check_Dependencies() {
     fi
   elif [ "$is_docker" == "yes" ]; then
     if [ "$is_ubuntu" = "yes" ]; then
-      if command -v apt-get &>/dev/null; then
+      if ! command -v apt-get &>/dev/null; then
         echo "Updating apt.."
         DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get upgrade -yqq
       fi
@@ -530,7 +528,7 @@ Check_Dependencies() {
         echo "You may need to install curl, cmake, screen, tmux, unzip, libcurl4, openssl, libc6 and libcrypt1 with your package manager for the server to start properly!"
       fi
     elif [ "$is_alpine" = "yes" ]; then
-      if command -v apk &>/dev/null; then
+      if ! command -v apk &>/dev/null; then
         echo "Updating apk.."
         apk update && apk upgrade
       fi
