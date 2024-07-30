@@ -30,6 +30,17 @@ if [ "$is_docker" != "yes" ]; then
   fi
 fi
 
+if [ "$is_docker" == "yes" ]; then
+  mkdir -p /debian/dirname/minecraftbe/servername
+  mount --bind dirname/minecraftbe/servername /debian/dirname/minecraftbe/servername
+fi
+
+if [ "$is_docker" != "yes" ]; then
+  if ! command -v gawk &>/dev/null; then sudo apk add gawk; fi
+elif [ "$is_docker" == "yes" ]; then
+  if ! command -v gawk &>/dev/null; then apk add gawk; fi
+fi
+
 # Randomizer for user agent
 RandNum=$((1 + $RANDOM % 5000))
 
