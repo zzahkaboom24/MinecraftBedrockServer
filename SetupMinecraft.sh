@@ -326,21 +326,8 @@ Check_Dependencies() {
     fi
 
       echo "Checking and installing dependencies.."
-      if ! command -v curl &>/dev/null; then apk add curl; fi
-      if ! command -v cmake &>/dev/null; then apk add cmake; fi
-      if ! command -v make &>/dev/null; then apk add make; fi
-      if ! command -v gcc &>/dev/null; then apk add gcc; fi
-      if ! apk info -a | grep musl-dev &>/dev/null; then apk add musl-dev; fi
-      if ! apk info -a | grep build-base &>/dev/null; then apk add build-base; fi
-      if ! apk info -a | grep linux-headers &>/dev/null; then apk add linux-headers; fi
-      if ! command -v bison &>/dev/null; then apk add bison; fi
-      if ! apk info -a | grep fts &>/dev/null; then apk add fts; fi
-      if ! command -v unzip &>/dev/null; then apk add unzip; fi
-      if ! command -v route &>/dev/null; then apk add net-tools; fi
-      if ! command -v gawk &>/dev/null; then apk add gawk; fi
-      if ! command -v openssl &>/dev/null; then apk add openssl; fi
-      if ! command -v xargs &>/dev/null; then apk add findutils; fi
-      if ! command -v pigz &>/dev/null; then apk add pigz; fi
+      if ! command -v bash &>/dev/null; then apk add bash; fi
+      if ! command -v lsb_release &>/dev/null; then apk add lsb-release; fi
 
       CurlVer=$(apk info libcurl | grep -e 'libcurl-8' | awk 'NR==1{ print $1 }')
         if [ "$CurlVer" ]; then
