@@ -161,6 +161,7 @@ while true; do
       fi
     fi
   fi
+done
 
 Update_Scripts() {
   # Remove existing scripts
