@@ -448,9 +448,12 @@ Check_Dependencies() {
               sudo apk add gcompat
             fi
           fi
-      
+
+      # Double check curl since libcurl dependency issues can sometimes remove it
       if ! command -v curl &>/dev/null; then 
         sudo apk add curl
+        echo "Dependency installation completed"
+      elif command -v curl &>/dev/null; then
         echo "Dependency installation completed"
       else
         echo "Warning: apk was not found."
@@ -544,8 +547,11 @@ Check_Dependencies() {
               apk add gcompat
             fi
           fi
-      
-      if ! command -v curl &>/dev/null; then 
+
+      # Double check curl since libcurl dependency issues can sometimes remove it
+      if command -v curl &>/dev/null; then 
+        echo "Dependency installation completed"
+      elif ! command -v curl &>/dev/null; then
         apk add curl
         echo "Dependency installation completed"
       else
