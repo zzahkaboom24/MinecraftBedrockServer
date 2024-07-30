@@ -12,12 +12,22 @@ else
   echo "You likely need to download an updated version of SetupMinecraft.sh from GitHub!"
 fi
 
+is_docker=""
+
+if [ "isdocker" == "yes" ]; then
+  is_docker="yes"
+else
+  is_docker="no"
+fi
+
 # Check to make sure we aren't running as root
-if [[ $(id -u) = 0 ]]; then
-  echo "This script is not meant to be run as root."
-  echo "Please run ./restart.sh as a non-root user, without sudo."
-  echo "Exiting..."
-  exit 1
+if [ "$is_docker" != "yes" ]; then
+  if [[ $(id -u) = 0 ]]; then
+      echo "This script is not meant to be run as root."
+      echo "Please run ./start.sh as a non-root user, without sudo."
+      echo "Exiting..."
+      exit 1
+  fi
 fi
 
 # Check if server is started
@@ -134,10 +144,18 @@ if [ "tmux" == "screen" ]; then
   echo "Starting Minecraft server."
   echo "To view window type screen -r servername"
   echo "To minimize the window and let the server run in the background, press Ctrl+A then Ctrl+D"
-  sudo -n systemctl start servername
+  if [ "$is_docker" != "yes" ]; then
+    sudo -n systemctl start servername
+  elif [ "$is_docker" == "yes" ]; then
+    supervisorctl start servername
+  fi
 elif [ "tmux" == "tmux" ]; then
   echo "Starting Minecraft server."
   echo "To view window type tmux attach -t servername:0.0"
   echo "To minimize the window and let the server run in the background, press Ctrl+B+D"
-  sudo -n systemctl start servername
+  if [ "$is_docker" != "yes" ]; then
+    sudo -n systemctl start servername
+  elif [ "$is_docker" == "yes" ]; then
+    supervisorctl start servername
+  fi
 fi
