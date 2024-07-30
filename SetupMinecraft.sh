@@ -9,8 +9,6 @@
 #
 # GitHub Repository: https://github.com/TheRemote/MinecraftBedrockServer
 
-set -x
-
 echo "Minecraft Bedrock Server installation script by James A. Chambers"
 echo "Latest version always at https://github.com/TheRemote/MinecraftBedrockServer"
 echo "Don't forget to set up port forwarding on your router! The default port is 19132"
@@ -71,7 +69,7 @@ echo ""
 echo "Are you running this script inside a Docker container? (default 'no'): "
 echo "Type 'yes' or 'no' to make sure everything runs correctly."
 echo "Leave the input blank to default to 'no'"
-read_with_prompt IsDocker "Is Docker" docker
+read_with_prompt IsDocker "Is Docker" no
 if [ "$IsDocker" == "yes" ]; then
   is_docker="yes"
 else
