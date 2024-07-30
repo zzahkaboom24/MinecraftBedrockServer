@@ -12,12 +12,22 @@ else
    echo "You likely need to download an updated version of SetupMinecraft.sh from GitHub!"
 fi
 
+is_docker=""
+
+if [ "isdocker" == "yes" ]; then
+  is_docker="yes"
+else
+  is_docker="no"
+fi
+
 # Check to make sure we aren't running as root
-if [ $(id -u) = 0 ]; then
-   echo "This script is not meant to be run as root."
-   echo "Please run ./update.sh as a non-root user, without sudo."
-   echo "Exiting..."
-   exit 1
+if [ "$is_docker" != "yes" ]; then
+  if [[ $(id -u) = 0 ]]; then
+      echo "This script is not meant to be run as root."
+      echo "Please run ./start.sh as a non-root user, without sudo."
+      echo "Exiting..."
+      exit 1
+  fi
 fi
 
 curl -sSL https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/SetupMinecraft.sh | bash
