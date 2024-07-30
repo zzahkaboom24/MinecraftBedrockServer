@@ -104,38 +104,63 @@ while true; do
   read_with_prompt ViewManager "View Manager" screen
 
   # Installing the chosen Terminal ViewManager
-  if [ "$is_ubuntu" = "yes" ]; then
-    if [ "$ViewManager" == "screen" ]; then
-      if ! command -v screen &>/dev/null; then
-        sudo DEBIAN_FRONTEND=noninteractive apt-get install screen -yqq
+  if [ "$is_docker" != "yes" ]; then
+    if [ "$is_ubuntu" = "yes" ]; then
+      if [ "$ViewManager" == "screen" ]; then
+        if ! command -v screen &>/dev/null; then
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install screen -yqq
+        fi
+      elif [ "$ViewManager" == "tmux" ]; then
+        if ! command -v tmux &>/dev/null; then
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install tmux -yqq
+        fi
+      else
+        echo "Invalid choice."
+        echo "Please enter 'screen', 'tmux' or hit enter to default back to 'screen'."
       fi
-      break
-    elif [ "$ViewManager" == "tmux" ]; then
-      if ! command -v tmux &>/dev/null; then
-        sudo DEBIAN_FRONTEND=noninteractive apt-get install tmux -yqq
+    elif [ "$is_alpine" = "yes" ]; then
+      if [ "$ViewManager" == "screen" ]; then
+        if ! command -v screen &>/dev/null; then
+          sudo apk add screen
+        fi
+      elif [ "$ViewManager" == "tmux" ]; then
+        if ! command -v tmux &>/dev/null; then
+          sudo apk add tmux
+        fi
+      else
+        echo "Invalid choice."
+        echo "Please enter 'screen', 'tmux' or hit enter to default back to 'screen'."
       fi
-      break
-    else
-      echo "Invalid choice."
-      echo "Please enter 'screen', 'tmux' or hit enter to default back to 'screen'."
     fi
-  elif [ "$is_alpine" = "yes" ]; then
-    if [ "$ViewManager" == "screen" ]; then
-      if ! command -v screen &>/dev/null; then
-        apk add screen
+  elif [ "$is_docker" == "yes" ]; then
+    if [ "$is_ubuntu" = "yes" ]; then
+      if [ "$ViewManager" == "screen" ]; then
+        if ! command -v screen &>/dev/null; then
+          DEBIAN_FRONTEND=noninteractive apt-get install screen -yqq
+        fi
+      elif [ "$ViewManager" == "tmux" ]; then
+        if ! command -v tmux &>/dev/null; then
+          DEBIAN_FRONTEND=noninteractive apt-get install tmux -yqq
+        fi
+      else
+        echo "Invalid choice."
+        echo "Please enter 'screen', 'tmux' or hit enter to default back to 'screen'."
       fi
-      break
-    elif [ "$ViewManager" == "tmux" ]; then
-      if ! command -v tmux &>/dev/null; then
-        apk add tmux
+    elif [ "$is_alpine" = "yes" ]; then
+      if [ "$ViewManager" == "screen" ]; then
+        if ! command -v screen &>/dev/null; then
+          apk add screen
+        fi
+      elif [ "$ViewManager" == "tmux" ]; then
+        if ! command -v tmux &>/dev/null; then
+          apk add tmux
+        fi
+      else
+        echo "Invalid choice."
+        echo "Please enter 'screen', 'tmux' or hit enter to default back to 'screen'."
       fi
-      break
-    else
-      echo "Invalid choice."
-      echo "Please enter 'screen', 'tmux' or hit enter to default back to 'screen'."
     fi
   fi
-  done
 
 Update_Scripts() {
   # Remove existing scripts
@@ -215,50 +240,121 @@ Update_Scripts() {
 }
 
 Update_Service() {
-  # Update minecraft server service
-  echo "Configuring Minecraft $ServerName service..."
-  sudo curl -sSL -H "Accept-Encoding: identity" -L -o /etc/systemd/system/$ServerName.service https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/minecraftbe.service
-  sudo chmod +x /etc/systemd/system/$ServerName.service
-  sudo sed -i "s:userxname:$UserName:g" /etc/systemd/system/$ServerName.service
-  sudo sed -i "s:dirname:$DirName:g" /etc/systemd/system/$ServerName.service
-  sudo sed -i "s:servername:$ServerName:g" /etc/systemd/system/$ServerName.service
-  if [ -e server.properties ]; then
-    sed -i "/server-port=/c\server-port=$PortIPV4" server.properties
-    sed -i "/server-portv6=/c\server-portv6=$PortIPV6" server.properties
+  if [ "$is_docker" != "yes" ]; then
+    # Update minecraft server service
+    echo "Configuring Minecraft $ServerName service..."
+    sudo curl -sSL -H "Accept-Encoding: identity" -L -o /etc/systemd/system/$ServerName.service https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/minecraftbe.service
+    sudo chmod +x /etc/systemd/system/$ServerName.service
+    sudo sed -i "s:userxname:$UserName:g" /etc/systemd/system/$ServerName.service
+    sudo sed -i "s:dirname:$DirName:g" /etc/systemd/system/$ServerName.service
+    sudo sed -i "s:servername:$ServerName:g" /etc/systemd/system/$ServerName.service
+    if [ -e server.properties ]; then
+      sed -i "/server-port=/c\server-port=$PortIPV4" server.properties
+      sed -i "/server-portv6=/c\server-portv6=$PortIPV6" server.properties
+    fi
+  elif [ "$is_docker" == "yes" ]; then
+    # Update minecraft server service
+    UserName=$(whoami)
+    echo "Configuring Minecraft $ServerName service..."
+    echo "[program:$ServerName]" >> /etc/supervisord.conf
+    echo "command=/bin/sh $DirName/minecraftbe/$ServerName/start.sh" >> /etc/supervisord.conf
+    echo "autostart=false" >> /etc/supervisord.conf
+    echo "autorestart=false" >> /etc/supervisord.conf
+    echo "user=$UserName" >> /etc/supervisord.conf
+    echo "directory=$DirName/minecraftbe/$ServerName" >> /etc/supervisord.conf
   fi
 
-  sudo systemctl daemon-reload
+  if [ "$is_docker" != "yes" ]; then
+    sudo systemctl daemon-reload
+  elif [ "$is_docker" == "yes" ]; then
+    supervisorctl reread
+    supervisorctl update
+  fi
   echo ""
   echo -n "Start Minecraft server at startup automatically (y/n)? "
   read answer </dev/tty
-  if [[ "$answer" != "${answer#[Yy]}" ]]; then
-    sudo systemctl enable $ServerName.service
-    # Automatic reboot at 4am configuration
-    TimeZone=$(cat /etc/timezone)
-    CurrentTime=$(date)
-    echo "Your time zone is currently set to $TimeZone."
-    echo "Current system time: $CurrentTime"
-    echo "You can adjust/remove the selected reboot time later by typing crontab -e or running SetupMinecraft.sh again."
-    echo ""
-    echo -n "Automatically restart and backup server at 4am daily (y/n)? "
-    read answer </dev/tty
+  if [ "$is_docker" != "yes" ]; then
     if [[ "$answer" != "${answer#[Yy]}" ]]; then
-      croncmd="$DirName/minecraftbe/$ServerName/restart.sh 2>&1"
-      cronjob="0 4 * * * $croncmd"
-      (
-        crontab -l | grep -v -F "$croncmd"
-        echo "$cronjob"
-      ) | crontab -
-      echo "Daily restart scheduled."
-      echo "To change time or remove automatic restart type crontab -e."
+      sudo systemctl enable $ServerName.service
+      # Automatic reboot at 4am configuration
+      TimeZone=$(cat /etc/timezone)
+      CurrentTime=$(date)
+      echo "Your time zone is currently set to $TimeZone."
+      echo "Current system time: $CurrentTime"
+      echo "You can adjust/remove the selected reboot time later by typing crontab -e or running SetupMinecraft.sh again."
+      echo ""
+      echo -n "Automatically restart and backup server at 4am daily (y/n)? "
+      read answer </dev/tty
+      if [[ "$answer" != "${answer#[Yy]}" ]]; then
+        croncmd="$DirName/minecraftbe/$ServerName/restart.sh 2>&1"
+        cronjob="0 4 * * * $croncmd"
+        (
+          crontab -l | grep -v -F "$croncmd"
+          echo "$cronjob"
+        ) | crontab -
+        echo "Daily restart scheduled."
+        echo "To change time or remove automatic restart type crontab -e."
+      fi
+    elif [[ "$answer" != "${answer#[Nn]}" ]]; then
+      echo -n "Automatically restart and backup server at 4am daily (y/n)? "
+      read answer </dev/tty
+      if [[ "$answer" != "${answer#[Yy]}" ]]; then
+        croncmd="$DirName/minecraftbe/$ServerName/restart.sh 2>&1"
+        cronjob="0 4 * * * $croncmd"
+        (
+          crontab -l | grep -v -F "$croncmd"
+          echo "$cronjob"
+        ) | crontab -
+        echo "Daily restart scheduled."
+        echo "To change time or remove automatic restart type crontab -e."
+      fi
     fi
-  fi
+  elif [ "$is_docker" == "yes" ]; then
+    if [[ "$answer" != "${answer#[Yy]}" ]]; then
+      # Automatic reboot at 4am configuration
+      TimeZone=$(cat /etc/timezone)
+      CurrentTime=$(date)
+      echo "Your time zone is currently set to $TimeZone."
+      echo "Current system time: $CurrentTime"
+      echo "You can adjust/remove the selected reboot time later by typing crontab -e or running SetupMinecraft.sh again."
+      echo ""
+      echo -n "Automatically restart and backup server at 4am daily (y/n)? "
+      read answer </dev/tty
+      if [[ "$answer" != "${answer#[Yy]}" ]]; then
+        croncmd="docker exec -it Pterodactyl $DirName/minecraftbe/$ServerName/restart.sh 2>&1"
+        cronjob="0 4 * * * $croncmd"
+        (
+          crontab -l | grep -v -F "$croncmd"
+          echo "$cronjob"
+        ) | crontab -
+        echo "Daily restart scheduled."
+        echo "To change time or remove automatic restart type crontab -e."
+      fi
+    elif [[ "$answer" != "${answer#[Nn]}" ]]; then
+      echo -n "Automatically restart and backup server at 4am daily (y/n)? "
+      read answer </dev/tty
+      if [[ "$answer" != "${answer#[Yy]}" ]]; then
+        croncmd="docker exec -it Pterodactyl $DirName/minecraftbe/$ServerName/restart.sh 2>&1"
+        cronjob="0 4 * * * $croncmd"
+        (
+          crontab -l | grep -v -F "$croncmd"
+          echo "$cronjob"
+        ) | crontab -
+        echo "Daily restart scheduled."
+        echo "To change time or remove automatic restart type crontab -e."
+      fi
+    fi
+  fi  
 }
 
 Fix_Permissions() {
   echo ""
   echo "Setting server file permissions..."
-  sudo ./fixpermissions.sh -a >/dev/null
+  if [ "$is_docker" != "yes" ]; then
+    sudo ./fixpermissions.sh -a >/dev/null
+  elif [ "$is_docker" == "yes" ]; then
+    ./fixpermissions.sh -a >/dev/null
+  fi
 }
 
 Check_Dependencies() {
@@ -642,7 +738,7 @@ if [ -d "$ServerName" ]; then
     sudo systemctl daemon-reload
     sudo systemctl start "$ServerName.service"
   elif [ "$is_docker" == "yes" ]; then
-    $DirName/minecraftbe/$ServerName/start.sh
+    supervisorctl start $ServerName
   fi
 
   exit 0
@@ -685,7 +781,7 @@ if [ "$is_docker" != "yes" ]; then
   sudo systemctl daemon-reload
   sudo systemctl start "$ServerName.service"
 elif [ "$is_docker" == "yes" ]; then
-  $DirName/minecraftbe/$ServerName/start.sh
+  supervisorctl start $ServerName
 fi
 
 # Wait up to 30 seconds for server to start
