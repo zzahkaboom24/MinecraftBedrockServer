@@ -98,7 +98,7 @@ while [ -z "$DefaultRoute" ]; do
 done
 
 # Take ownership of server files and set correct permissions
-if [ "$is_docker" == "yes" ]; then
+if [ "$is_docker" != "yes" ]; then
   Permissions=$(sudo bash dirname/minecraftbe/servername/fixpermissions.sh -a)
 elif [ "$is_docker" == "yes" ]; then
   Permissions=$(bash dirname/minecraftbe/servername/fixpermissions.sh -a)
