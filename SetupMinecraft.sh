@@ -579,8 +579,7 @@ Update_Server() {
   unzip -o "downloads/$DownloadFile"
 }
 
-Check_Architecture() 
-{
+Check_Architecture() {
   # Check CPU archtecture to see if we need to do anything special for the platform the server is running on
   echo "Getting system CPU architecture..."
   CPUArch=$(uname -m)
