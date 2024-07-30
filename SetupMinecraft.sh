@@ -664,29 +664,53 @@ Check_Architecture() {
     fi
   elif [ "$is_docker" == "yes" ]; then
     if [[ "$CPUArch" == *"aarch"* ]]; then
-      if ! command -v debootstrap &>/dev/null; then apk add debootstrap; fi
-      if [ -d "/debian" ] && [ -f "/debian/etc/debian_version" ]; then
-        echo "Debian is installed in the chroot environment."
+      if ! command -v debootstrap &>/dev/null; then
+        apk add debootstrap
         debootstrap stable /debian http://deb.debian.org/debian/
-        chroot /debian /bin/bash -c "apt install -y git cmake python3 curl unzip"
-        # ARM architecture detected -- download QEMU and dependency libraries
-        echo "aarch64 platform detected -- installing box64..."
-        chroot /debian /bin/bash -c "curl -sSL -H \"Accept-Encoding: identity\" -L -o v0.2.6.zip https://github.com/ptitSeb/box64/archive/refs/tags/v0.2.6.zip"
-        chroot /debian /bin/bash -c "unzip v0.2.6.zip"
-        chroot /debian /bin/bash -c "rm v0.2.6.zip"
-        echo "building box64 from source for generic ARM64 Linux platforms -- version 0.2.6..."
-        sleep 5
-        chroot /debian /bin/bash -c "cd box64-0.2.6; mkdir build; cd build; cmake .. -D ARM_DYNAREC=ON -D CMAKE_BUILD_TYPE=RelWithDebInfo"
-        chroot /debian /bin/bash -c "cd box64-0.2.6; cd build; make -j4"
-        chroot /debian /bin/bash -c "cd box64-0.2.6; cd build; make install"
-        chroot /debian /bin/bash -c "rm -r box64-0.2.6"
-        chroot /debian /bin/bash -c "which box64"
-
-        if [ -n "$(chroot /debian /bin/bash -c "which box64")" ]; then
-          echo "box64 installed successfully or already installed"
-        else
-          echo "box64 did not install successfully -- please check the above output to see what went wrong."
+        if [ -d "/debian" ] && [ -f "/debian/etc/debian_version" ]; then
+          echo "Debian is installed in the chroot environment."
+          if [ ! -n "$(chroot /debian /bin/bash -c "which box64")" ]; then
+            chroot /debian /bin/bash -c "apt install -y git cmake python3 curl unzip"
+            # ARM architecture detected -- download QEMU and dependency libraries
+            echo "aarch64 platform detected -- installing box64..."
+            chroot /debian /bin/bash -c "curl -sSL -H \"Accept-Encoding: identity\" -L -o v0.2.6.zip https://github.com/ptitSeb/box64/archive/refs/tags/v0.2.6.zip"
+            chroot /debian /bin/bash -c "unzip v0.2.6.zip"
+            chroot /debian /bin/bash -c "rm v0.2.6.zip"
+            echo "building box64 from source for generic ARM64 Linux platforms -- version 0.2.6..."
+            sleep 5
+            chroot /debian /bin/bash -c "cd box64-0.2.6; mkdir build; cd build; cmake .. -D ARM_DYNAREC=ON -D CMAKE_BUILD_TYPE=RelWithDebInfo"
+            chroot /debian /bin/bash -c "cd box64-0.2.6; cd build; make -j4"
+            chroot /debian /bin/bash -c "cd box64-0.2.6; cd build; make install"
+            chroot /debian /bin/bash -c "rm -r box64-0.2.6"
+          elif [ -n "$(chroot /debian /bin/bash -c "which box64")" ]; then
+            echo "box64 installed successfully or already installed"
+          fi
         fi
+      elif command -v debootstrap &>/dev/null; then 
+        if [ -d "/debian" ] && [ -f "/debian/etc/debian_version" ]; then
+          echo "Debian is installed in the chroot environment."
+          if [ ! -n "$(chroot /debian /bin/bash -c "which box64")" ]; then 
+            chroot /debian /bin/bash -c "apt install -y git cmake python3 curl unzip"
+            # ARM architecture detected -- download QEMU and dependency libraries
+            echo "aarch64 platform detected -- installing box64..."
+            chroot /debian /bin/bash -c "curl -sSL -H \"Accept-Encoding: identity\" -L -o v0.2.6.zip https://github.com/ptitSeb/box64/archive/refs/tags/v0.2.6.zip"
+            chroot /debian /bin/bash -c "unzip v0.2.6.zip"
+            chroot /debian /bin/bash -c "rm v0.2.6.zip"
+            echo "building box64 from source for generic ARM64 Linux platforms -- version 0.2.6..."
+            sleep 5
+            chroot /debian /bin/bash -c "cd box64-0.2.6; mkdir build; cd build; cmake .. -D ARM_DYNAREC=ON -D CMAKE_BUILD_TYPE=RelWithDebInfo"
+            chroot /debian /bin/bash -c "cd box64-0.2.6; cd build; make -j4"
+            chroot /debian /bin/bash -c "cd box64-0.2.6; cd build; make install"
+            chroot /debian /bin/bash -c "rm -r box64-0.2.6"
+          elif [ -n "$(chroot /debian /bin/bash -c "which box64")" ]; then
+            echo "box64 installed successfully or already installed"
+          fi
+
+      if [ -n "$(chroot /debian /bin/bash -c "which box64")" ]; then
+        echo "box64 installed successfully or already installed"
+      else
+        echo "box64 did not install successfully -- please check the above output to see what went wrong."
+      fi
 
         # Retrieve depends.zip from GitHub repository
         curl -sSL -H "Accept-Encoding: identity" -L -o depends.zip https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/depends.zip
