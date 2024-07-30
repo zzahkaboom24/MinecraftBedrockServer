@@ -110,10 +110,12 @@ while true; do
         if ! command -v screen &>/dev/null; then
           sudo DEBIAN_FRONTEND=noninteractive apt-get install screen -yqq
         fi
+        break
       elif [ "$ViewManager" == "tmux" ]; then
         if ! command -v tmux &>/dev/null; then
           sudo DEBIAN_FRONTEND=noninteractive apt-get install tmux -yqq
         fi
+        break
       else
         echo "Invalid choice."
         echo "Please enter 'screen', 'tmux' or hit enter to default back to 'screen'."
@@ -123,10 +125,12 @@ while true; do
         if ! command -v screen &>/dev/null; then
           sudo apk add screen
         fi
+        break
       elif [ "$ViewManager" == "tmux" ]; then
         if ! command -v tmux &>/dev/null; then
           sudo apk add tmux
         fi
+        break
       else
         echo "Invalid choice."
         echo "Please enter 'screen', 'tmux' or hit enter to default back to 'screen'."
@@ -138,10 +142,12 @@ while true; do
         if ! command -v screen &>/dev/null; then
           DEBIAN_FRONTEND=noninteractive apt-get install screen -yqq
         fi
+        break
       elif [ "$ViewManager" == "tmux" ]; then
         if ! command -v tmux &>/dev/null; then
           DEBIAN_FRONTEND=noninteractive apt-get install tmux -yqq
         fi
+        break
       else
         echo "Invalid choice."
         echo "Please enter 'screen', 'tmux' or hit enter to default back to 'screen'."
@@ -151,10 +157,12 @@ while true; do
         if ! command -v screen &>/dev/null; then
           apk add screen
         fi
+        break
       elif [ "$ViewManager" == "tmux" ]; then
         if ! command -v tmux &>/dev/null; then
           apk add tmux
         fi
+        break
       else
         echo "Invalid choice."
         echo "Please enter 'screen', 'tmux' or hit enter to default back to 'screen'."
