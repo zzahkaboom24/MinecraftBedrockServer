@@ -145,6 +145,7 @@ Update_Scripts() {
   echo "Grabbing start.sh from repository..."
   curl -sSL -H "Accept-Encoding: identity" -L -o start.sh https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/start.sh
   chmod +x start.sh
+  sed -i "s:isdocker:$IsDocker:g" start.sh
   sed -i "s:dirname:$DirName:g" start.sh
   sed -i "s:servername:$ServerName:g" start.sh
   sed -i "s:userxname:$UserName:g" start.sh
@@ -155,6 +156,7 @@ Update_Scripts() {
   echo "Grabbing stop.sh from repository..."
   curl -sSL -H "Accept-Encoding: identity" -L -o stop.sh https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/stop.sh
   chmod +x stop.sh
+  sed -i "s:isdocker:$IsDocker:g" stop.sh
   sed -i "s:dirname:$DirName:g" stop.sh
   sed -i "s:servername:$ServerName:g" stop.sh
   sed -i "s:userxname:$UserName:g" stop.sh
@@ -165,6 +167,7 @@ Update_Scripts() {
   echo "Grabbing restart.sh from repository..."
   curl -sSL -H "Accept-Encoding: identity" -L -o restart.sh https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/restart.sh
   chmod +x restart.sh
+  sed -i "s:isdocker:$IsDocker:g" restart.sh
   sed -i "s:dirname:$DirName:g" restart.sh
   sed -i "s:servername:$ServerName:g" restart.sh
   sed -i "s:userxname:$UserName:g" restart.sh
@@ -175,6 +178,7 @@ Update_Scripts() {
   echo "Grabbing fixpermissions.sh from repository..."
   curl -sSL -H "Accept-Encoding: identity" -L -o fixpermissions.sh https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/fixpermissions.sh
   chmod +x fixpermissions.sh
+  sed -i "s:isdocker:$IsDocker:g" fixpermissions.sh
   sed -i "s:dirname:$DirName:g" fixpermissions.sh
   sed -i "s:servername:$ServerName:g" fixpermissions.sh
   sed -i "s:userxname:$UserName:g" fixpermissions.sh
@@ -185,6 +189,7 @@ Update_Scripts() {
   echo "Grabbing revert.sh from repository..."
   curl -sSL -H "Accept-Encoding: identity" -L -o revert.sh https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/revert.sh
   chmod +x revert.sh
+  sed -i "s:isdocker:$IsDocker:g" revert.sh
   sed -i "s:dirname:$DirName:g" revert.sh
   sed -i "s:servername:$ServerName:g" revert.sh
   sed -i "s:userxname:$UserName:g" revert.sh
@@ -195,6 +200,7 @@ Update_Scripts() {
   echo "Grabbing clean.sh from repository..."
   curl -sSL -H "Accept-Encoding: identity" -L -o clean.sh https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/master/clean.sh
   chmod +x clean.sh
+  sed -i "s:isdocker:$IsDocker:g" clean.sh
   sed -i "s:dirname:$DirName:g" clean.sh
   sed -i "s:servername:$ServerName:g" clean.sh
   sed -i "s:userxname:$UserName:g" clean.sh
