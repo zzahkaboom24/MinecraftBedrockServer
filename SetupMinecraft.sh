@@ -363,11 +363,10 @@ Check_Dependencies() {
   # Install dependencies required to run Minecraft server in the background
   if [ "$is_docker" != "yes" ]; then
     if [ "$is_ubuntu" = "yes" ]; then
-      if ! command -v apt-get &>/dev/null; then
+      if command -v apt-get &>/dev/null; then
         echo "Updating apt.."
         sudo DEBIAN_FRONTEND=noninteractive apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -yqq
       fi
-
         echo "Checking and installing dependencies.."
         if ! command -v curl &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install curl -yqq; fi
         if ! command -v cmake &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install cmake -yqq; fi
@@ -377,7 +376,6 @@ Check_Dependencies() {
         if ! command -v openssl &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install openssl -yqq; fi
         if ! command -v xargs &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install findutils -yqq; fi
         if ! command -v pigz &>/dev/null; then sudo DEBIAN_FRONTEND=noninteractive apt-get install pigz -yqq; fi
-
         CurlVer=$(apt-cache show libcurl4 | grep Version | awk 'NR==1{ print $2 }')
           if [[ "$CurlVer" ]]; then
             sudo DEBIAN_FRONTEND=noninteractive apt-get install libcurl4 -yqq
@@ -386,7 +384,6 @@ Check_Dependencies() {
             CurlVer=$(apt-cache show libcurl3 | grep Version | awk 'NR==1{ print $2 }')
             if [[ "$CurlVer" ]]; then sudo DEBIAN_FRONTEND=noninteractive apt-get install libcurl3 -yqq; fi
           fi
-
         UbuntuVer=$(lsb_release -d | cut -f2- | cut -d' ' -f2 | cut -d'.' -f1,2)
           if [[ $(echo "$UbuntuVer >= 22.04" | bc -l) -eq 1 ]]; then
             # Install libssl3 dependency as Bedrock server is linking to both
@@ -415,7 +412,6 @@ Check_Dependencies() {
               echo "Manual libssl1.1 installation failed."
             fi
           fi
-
       # Double check curl since libcurl dependency issues can sometimes remove it
       if ! command -v curl &>/dev/null; then 
         sudo DEBIAN_FRONTEND=noninteractive apt-get install curl -yqq
@@ -425,15 +421,13 @@ Check_Dependencies() {
         echo "You may need to install curl, cmake, screen, tmux, unzip, libcurl4, openssl, libc6 and libcrypt1 with your package manager for the server to start properly!"
       fi
     elif [ "$is_alpine" = "yes" ]; then
-      if ! command -v apk &>/dev/null; then
+      if command -v apk &>/dev/null; then
         echo "Updating apk.."
         sudo apk update && sudo apk upgrade
       fi
-
         echo "Checking and installing dependencies.."
         if ! command -v bash &>/dev/null; then sudo apk add bash; fi
         if ! command -v lsb_release &>/dev/null; then sudo apk add lsb-release; fi
-
         CurlVer=$(apk info libcurl | grep -e 'libcurl-8' | awk 'NR==1{ print $1 }')
           if [ "$CurlVer" ]; then
             sudo apk add curl-dev
@@ -441,7 +435,6 @@ Check_Dependencies() {
             # Install libcurl3 for backwards compatibility in case libcurl4 isn't available
             sudo apk add curl
           fi
-
         AlpineVer=$(lsb_release -d | cut -f2- | cut -d' ' -f3 | cut -d'.' -f1,2 | sed 's/^v//')
           if [[ $(echo "$AlpineVer >= 3.19" | bc -l) -eq 1 ]]; then
             # Install libssl3 dependency as Bedrock server is linking to both
@@ -466,11 +459,10 @@ Check_Dependencies() {
     fi
   elif [ "$is_docker" == "yes" ]; then
     if [ "$is_ubuntu" = "yes" ]; then
-      if ! command -v apt-get &>/dev/null; then
+      if command -v apt-get &>/dev/null; then
         echo "Updating apt.."
         DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get upgrade -yqq
       fi
-
         echo "Checking and installing dependencies.."
         if ! command -v curl &>/dev/null; then DEBIAN_FRONTEND=noninteractive apt-get install curl -yqq; fi
         if ! command -v cmake &>/dev/null; then DEBIAN_FRONTEND=noninteractive apt-get install cmake -yqq; fi
@@ -480,7 +472,6 @@ Check_Dependencies() {
         if ! command -v openssl &>/dev/null; then DEBIAN_FRONTEND=noninteractive apt-get install openssl -yqq; fi
         if ! command -v xargs &>/dev/null; then DEBIAN_FRONTEND=noninteractive apt-get install findutils -yqq; fi
         if ! command -v pigz &>/dev/null; then DEBIAN_FRONTEND=noninteractive apt-get install pigz -yqq; fi
-
         CurlVer=$(apt-cache show libcurl4 | grep Version | awk 'NR==1{ print $2 }')
           if [[ "$CurlVer" ]]; then
             DEBIAN_FRONTEND=noninteractive apt-get install libcurl4 -yqq
@@ -489,7 +480,6 @@ Check_Dependencies() {
             CurlVer=$(apt-cache show libcurl3 | grep Version | awk 'NR==1{ print $2 }')
             if [[ "$CurlVer" ]]; then DEBIAN_FRONTEND=noninteractive apt-get install libcurl3 -yqq; fi
           fi
-
         UbuntuVer=$(lsb_release -d | cut -f2- | cut -d' ' -f2 | cut -d'.' -f1,2)
           if [[ $(echo "$UbuntuVer >= 22.04" | bc -l) -eq 1 ]]; then
             # Install libssl3 dependency as Bedrock server is linking to both
@@ -518,7 +508,6 @@ Check_Dependencies() {
               echo "Manual libssl1.1 installation failed."
             fi
           fi
-
       # Double check curl since libcurl dependency issues can sometimes remove it
       if ! command -v curl &>/dev/null; then 
         DEBIAN_FRONTEND=noninteractive apt-get install curl -yqq
@@ -528,15 +517,13 @@ Check_Dependencies() {
         echo "You may need to install curl, cmake, screen, tmux, unzip, libcurl4, openssl, libc6 and libcrypt1 with your package manager for the server to start properly!"
       fi
     elif [ "$is_alpine" = "yes" ]; then
-      if ! command -v apk &>/dev/null; then
+      if command -v apk &>/dev/null; then
         echo "Updating apk.."
         apk update && apk upgrade
       fi
-
         echo "Checking and installing dependencies.."
         if ! command -v bash &>/dev/null; then apk add bash; fi
         if ! command -v lsb_release &>/dev/null; then apk add lsb-release; fi
-
         CurlVer=$(apk info libcurl | grep -e 'libcurl-8' | awk 'NR==1{ print $1 }')
           if [ "$CurlVer" ]; then
             apk add curl-dev
@@ -544,7 +531,6 @@ Check_Dependencies() {
             # Install libcurl3 for backwards compatibility in case libcurl4 isn't available
             apk add curl
           fi
-
         AlpineVer=$(lsb_release -d | cut -f2- | cut -d' ' -f3 | cut -d'.' -f1,2 | sed 's/^v//')
           if [[ $(echo "$AlpineVer >= 3.19" | bc -l) -eq 1 ]]; then
             # Install libssl3 dependency as Bedrock server is linking to both
