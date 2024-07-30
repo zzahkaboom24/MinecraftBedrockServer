@@ -270,6 +270,7 @@ Update_Service() {
     supervisorctl reread
     supervisorctl update
   fi
+  
   echo ""
   echo -n "Start Minecraft server at startup automatically (y/n)? "
   read answer </dev/tty
@@ -311,6 +312,8 @@ Update_Service() {
     fi
   elif [ "$is_docker" == "yes" ]; then
     if [[ "$answer" != "${answer#[Yy]}" ]]; then
+      supervisorctl reread
+      supervisorctl update
       # Automatic reboot at 4am configuration
       TimeZone=$(cat /etc/timezone)
       CurrentTime=$(date)
@@ -321,27 +324,17 @@ Update_Service() {
       echo -n "Automatically restart and backup server at 4am daily (y/n)? "
       read answer </dev/tty
       if [[ "$answer" != "${answer#[Yy]}" ]]; then
-        croncmd="docker exec -it Pterodactyl $DirName/minecraftbe/$ServerName/restart.sh 2>&1"
-        cronjob="0 4 * * * $croncmd"
-        (
-          crontab -l | grep -v -F "$croncmd"
-          echo "$cronjob"
-        ) | crontab -
-        echo "Daily restart scheduled."
-        echo "To change time or remove automatic restart type crontab -e."
+        echo "Run `sudo crontab -e` on your host machine"
+        echo "and paste the following command at the end of the file:"
+        echo "0 4 * * * docker exec -it Pterodactyl $DirName/minecraftbe/$ServerName/restart.sh 2>&1"
       fi
     elif [[ "$answer" != "${answer#[Nn]}" ]]; then
       echo -n "Automatically restart and backup server at 4am daily (y/n)? "
       read answer </dev/tty
       if [[ "$answer" != "${answer#[Yy]}" ]]; then
-        croncmd="docker exec -it Pterodactyl $DirName/minecraftbe/$ServerName/restart.sh 2>&1"
-        cronjob="0 4 * * * $croncmd"
-        (
-          crontab -l | grep -v -F "$croncmd"
-          echo "$cronjob"
-        ) | crontab -
-        echo "Daily restart scheduled."
-        echo "To change time or remove automatic restart type crontab -e."
+        echo "Run `sudo crontab -e` on your host machine"
+        echo "and paste the following command at the end of the file:"
+        echo "0 4 * * * docker exec -it Pterodactyl $DirName/minecraftbe/$ServerName/restart.sh 2>&1"
       fi
     fi
   fi  
