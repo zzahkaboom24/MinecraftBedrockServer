@@ -31,7 +31,7 @@ if [ "$is_docker" != "yes" ]; then
 fi
 
 if [ "$is_docker" == "yes" ]; then
-  mkdir -p /debian/dirname/minecraftbe/servername
+  mkdir -p /debiandirname/minecraftbe/servername
   mount --bind dirname/minecraftbe/servername /debiandirname/minecraftbe/servername
 fi
 
