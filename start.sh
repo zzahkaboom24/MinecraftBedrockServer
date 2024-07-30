@@ -98,7 +98,11 @@ while [ -z "$DefaultRoute" ]; do
 done
 
 # Take ownership of server files and set correct permissions
-Permissions=$(sudo bash dirname/minecraftbe/servername/fixpermissions.sh -a)
+if [ "$is_docker" == "yes" ]; then
+  Permissions=$(sudo bash dirname/minecraftbe/servername/fixpermissions.sh -a)
+elif [ "$is_docker" == "yes" ]; then
+  Permissions=$(bash dirname/minecraftbe/servername/fixpermissions.sh -a)
+fi
 
 # Create backup
 if [ -d "worlds" ]; then
