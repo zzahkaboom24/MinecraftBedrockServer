@@ -667,7 +667,6 @@ Check_Architecture() {
       if ! command -v debootstrap &>/dev/null; then apk add debootstrap; fi
       if [ -d "/debian" ] && [ -f "/debian/etc/debian_version" ]; then
         echo "Debian is installed in the chroot environment."
-      else
         debootstrap stable /debian http://deb.debian.org/debian/
         chroot /debian /bin/bash -c "apt install -y git cmake python3 curl unzip"
         # ARM architecture detected -- download QEMU and dependency libraries
@@ -698,6 +697,9 @@ Check_Architecture() {
         ln -s $DirName/minecraftbe/$ServerName/ld-2.31.so /lib64/ld-linux-x86-64.so.2
         ln -s $DirName/minecraftbe/$ServerName/ld-2.33.so /lib64/ld-linux-x86-64.so.2
         ln -s $DirName/minecraftbe/$ServerName/ld-2.35.so /lib64/ld-linux-x86-64.so.2
+      else
+        echo "You are trying to run this script on an unsupported system."
+        exit 1
       fi
     fi
   fi
