@@ -39,6 +39,7 @@ curl -sSL https://raw.githubusercontent.com/zzahkaboom24/MinecraftBedrockServer/
 
 <h2>Tested Distributions</h2>
 <ul>
+ <li>Ubuntu / Ubuntu Server 24.04</li>
  <li>Ubuntu / Ubuntu Server 22.04</li>
  <li>Ubuntu / Ubuntu Server 20.04</li>
  <li>Ubuntu / Ubuntu Server 18.04</li>
@@ -108,6 +109,10 @@ See the following links:<br>
 
 <h2>Update History</h2>
 <ul>
+  <li>December 31st 2024</li>
+  <ul>
+    <li>Added Ubuntu / Ubuntu Server 24.04 to the tested distributions</li>
+  </ul>
   <li>January 16th 2024</li>
   <ul>
     <li>Full implementation of the <code>tmux</code> terminal multiplexer with parity to the legacy <code>screen</code> terminal multiplexer</li>
